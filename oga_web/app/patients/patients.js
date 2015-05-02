@@ -24,6 +24,10 @@ angular.module('oga_web.patients', ["ngRoute", "ngMaterial", "ngMdIcons", "ui.bo
 	$scope.createPatient = function(){
 		$location.path('/patient_new');
 	};
+	$scope.openGaitAnalysis = function (patient_id) {
+		$location.path('/gait_analysis/patient/' + patient_id + '/');
+	};
+
 })
 .factory("ogaFacade", function($http, ogawebapiConstant){
 	var _getPatient = function(id) {

@@ -6,6 +6,7 @@ angular.module('oga_web', [
 	"ngMaterial", 
 	"ngMdIcons", 
 	"ui.bootstrap",
+	'oga_web.gait_analysis', 
 	'oga_web.patients',
 	'oga_web.patient',
 	'myApp.view1',
