@@ -28,3 +28,17 @@
   content: "";
   padding: 0;
 }
+
+
+.oga-float-bottom-right {
+	position: absolute 	!important;
+	right:    0;
+	bottom:   0;
+}
+.oga-whole-page {
+	position: absolute	!important; 
+	top: 0; 
+	left: 0; 
+	height: 100%; 
+	width: 100%;
+}
