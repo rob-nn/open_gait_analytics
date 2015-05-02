@@ -1,0 +1,27 @@
+<md-toolbar layout="row">
+	<h1>{{apptitle}}</h1>
+	<span flex></span>
+</md-toolbar>
+
+<div layout="column" flex>
+	<md-input-container>
+		<label>Name</label>
+		<input ng-model='patient.name' />
+	</md-input-container>
+	<div>
+		<md-input-container>
+			<label>Birth</label>
+		</md-input-container>
+		<p>
+			<input is-open='opened' type='text' datepicker-popup='yyyy-M-d' ng-model='patient.birth'/>
+			<md-button aria-label='Born' ng-click='open($event)'>
+				<ng-md-icon icon='grid_on'></ng-md-icon>
+			</md-button>
+		</p>
+	</div>
+
+	<md-button aria-label='Save Patient' class="oga-float-bottom-right" ng-click='save()'>
+		<md-tooltip>Save Patient</md-tooltip>
+		<ng-md-icon icon="save" size="72" postion="br"></ng-md-icon>
+	</md-button>
+</div>

@@ -1,0 +1,8 @@
+env
+octave-workspace
+*~
+.DS_Store
+*.swp
+*.pyc
+*.prof*
+oga/static/bower_components

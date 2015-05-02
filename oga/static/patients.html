@@ -1,0 +1,27 @@
+<md-toolbar layout="row">
+	<md-button aria-label='Menu'>
+		<md-tooltip>Menu</md-tooltip>
+		<ng-md-icon icon="menu" size="48"></ng-md-icon>
+	</md-button>
+	<h1>{{apptitle}}</h1>
+	<span flex></span>
+	<md-button aria-label='List View' ng-show='showListViewIcon' ng-click='showListView()'>
+		<md-tooltip>List View</md-tooltip>
+		<ng-md-icon icon="list" size="48"></ng-md-icon>
+	</md-button>
+	<md-button aria-label='Grid View' ng-show='!showListViewIcon' ng-click='showGridView()'>
+		<md-tooltip>Grid View</md-tooltip>
+		<ng-md-icon icon="apps" size="48"></ng-md-icon>
+	</md-button>
+</md-toolbar>
+<div layout="column" flex>
+	<md-grid-list md-cols='4' md-row-height='200px' md-gutter=5>
+		<md-grid-tile ng-repeat='patient in patients'>
+			<md-grid-tile-footer>{{patient.name}}</md-grid-tile-footer>
+		</md-grid-tile>
+	</md-grid-list>
+	<md-button aria-label='Add Patient' class="oga-float-bottom-right" ng-click='createPatient()'>
+		<md-tooltip>Add Patient</md-tooltip>
+		<ng-md-icon icon="add_circle" size="72" postion="br"></ng-md-icon>
+	</md-button>
+</div>
