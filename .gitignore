@@ -6,3 +6,15 @@ octave-workspace
 *.pyc
 *.prof*
 oga/static/bower_components
+
+
+
+
+
+oga_web/logs/*
+oga_web/!.gitkeep
+oga_web/node_modules/
+oga_web/bower_components/
+oga_web/tmp
+oga_web/.DS_Store
+oga_web/.idea
