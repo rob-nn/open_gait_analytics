@@ -12,6 +12,9 @@ angular.module('oga_web.patients', ["ngRoute", "ngMaterial", "ngMdIcons", "ui.bo
 		}
 	});
 }])
+.constant("webapi", {
+	url:  'http://localhost:8000/patients/'
+})
 .controller('patientsCtrl', function ($rootScope, $scope, $location, patients){
 	$scope.showListViewIcon = true;
 	$scope.patients = patients.data;
@@ -29,15 +32,15 @@ angular.module('oga_web.patients', ["ngRoute", "ngMaterial", "ngMdIcons", "ui.bo
 	};
 
 })
-.factory("ogaFacade", function($http, ogawebapiConstant){
+.factory("ogaFacade", function($http, webapi){
 	var _getPatient = function(id) {
-		return $http.get(ogawebapiConstant.url + id + '/');
+		return $http.get(webapi.url + id + '/');
 	}
 	var _getPatients = function() {
-		return $http.get(ogawebapiConstant.url);
+		return $http.get(webapi.url);
 	};
 	var _addPatient = function(patient) {
-		return $http.post(ogawebapiConstant.url, patient);
+		return $http.post(webapi.url, patient);
 	};
 	return {
 		getPatients: _getPatients,

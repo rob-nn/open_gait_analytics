@@ -16,9 +16,6 @@ angular.module('oga_web', [
 .config(['$routeProvider', function($routeProvider) {
 	$routeProvider.otherwise({redirectTo: '/patients'});
 }])
-.constant("ogawebapiConstant", {
-	url:  'http://localhost:8000/patients/'
-})
 .run(function($rootScope) {
 	$rootScope.apptitle = 'Open Gait Analytics';
 });
