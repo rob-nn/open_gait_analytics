@@ -1,24 +1,27 @@
-<md-toolbar layout="row">
-	<h1>Gait Analysis</h1>
-	<span flex></span>
-</md-toolbar>
-<div layout='row' flex class='oga-content-wrapper'>
-	<md-sidenav layout="column" class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')">
-		<h2>{{patient.name}}</h2>
-		<p>Birth Date: {{patient.birth}}</p>
-		</br>
-		</br>
-		</br>
-		<md-button aria-label='Add Patient Gait Data' class="oga-float-bottom-right" >
-			<md-tooltip>Add Patient Gait Data</md-tooltip>
-			<ng-md-icon icon="add_circle" size="72" postion="br" ng-click='addGaitData()'></ng-md-icon>
+<section layout='row' felx>
+	<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
+		<md-toolbar layout="row">
+			<h1>Gait Analysis</h1>
+		</md-toolbar>
+		<md-button ng-click="close()" class="md-primary" hide-gt-md>
+			Close Side
 		</md-button>
+
+		<md-content layout-padding>
+			<h2>{{patient.name}}</h2>
+			<p>Birth Date: {{patient.birth|date:'dd/MMM/yyyy'}}</p>
+			<div ng-include src="'gait_analysis/list_samples.html'"></div>
+			<md-button aria-label='Add gait sample' ng-click='addGaitData()'>
+				<md-tooltip>Add gait sample</md-tooltip>
+				<ng-md-icon icon="add_circle" size="72" postion="br"></ng-md-icon>
+			</md-button>
+		</md-content>
 	</md-sidenav>
-	<div flex class="oga-content-wrapper">
-		<div layout='row' ng-show='isAdding'>
-			<input type="file" onchange="angular.element(this).scope().setFile(this)">
-			<button ng-click="uploadFile()">Upload</button>
-			<button ng-click="cancel()">Cancel</button>
-		</div>
-	</div>
-</div>
+
+	<md-content layout-padding>
+		<md-button ng-click="toggleLeft()" class="md-primary" hide-gt-md>
+			Open side	
+		</md-button>
+		<div flex ng-include src="'gait_analysis/gait_sample_detail.html'" ng-show='gaitSampleEnabled || isAdding'></div>
+	</md-content>
+</section>

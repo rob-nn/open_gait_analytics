@@ -10,3 +10,10 @@ class PatientViewSet(viewsets.ModelViewSet):
         permission_classes = [
                 permissions.AllowAny
 	]
+
+class GaitSampleViewSet(viewsets.ModelViewSet):
+	queryset = models.GaitSample.objects.all()
+	serializer_class = serializers.GaitSampleSerializer
+	permission_classes = [
+			permissions.AllowAny
+		]

@@ -1,19 +1,19 @@
 'use strict';
-angular.module('oga_web.patients', ["ngRoute", "ngMaterial", "ngMdIcons", "ui.bootstrap"])
+angular.module('oga_web.patients', ["ngRoute", "ngMaterial", "ngMdIcons", 'oga_web.oga_facade'])
 .config(['$routeProvider', function($routeProvider) {
 	$routeProvider
 	.when("/patients", {
 		templateUrl: "patients/patients.html",
 		controller: "patientsCtrl", 
 		resolve: {
-			patients: function(ogaFacade) {
-				return ogaFacade.getPatients();
+			patients: function(patientsFacade) {
+				return patientsFacade.getPatients();
 			}
 		}
 	});
 }])
 .constant("webapi", {
-	url:  'http://localhost:8000/patients/'
+	url:  'http://localhost:8000/'
 })
 .controller('patientsCtrl', function ($rootScope, $scope, $location, patients){
 	$scope.showListViewIcon = true;
@@ -25,31 +25,10 @@ angular.module('oga_web.patients', ["ngRoute", "ngMaterial", "ngMdIcons", "ui.bo
 		$scope.showListViewIcon = true;
 	};
 	$scope.createPatient = function(){
-		$location.path('/patient_new');
+		$location.path('/patient_new'); 
 	};
 	$scope.openGaitAnalysis = function (patient_id) {
 		$location.path('/gait_analysis/patient/' + patient_id + '/');
 	};
 
-})
-.factory("ogaFacade", function($http, webapi){
-	var _getPatient = function(id) {
-		return $http.get(webapi.url + id + '/');
-	}
-	var _getPatients = function() {
-		return $http.get(webapi.url);
-	};
-	var _addPatient = function(patient) {
-		return $http.post(webapi.url, patient);
-	};
-	return {
-		getPatients: _getPatients,
-		getPatient: _getPatient,
-		addPatient: _addPatient
-	};
 });
-
-
-
-
-

@@ -1,0 +1,13 @@
+<md-subheader>Gait samples.</md-subheader>
+<md-list flex>
+	<md-list-item ng-repeat='gait_sample in patient.samples' layout='column'>
+		<ng-content>
+			<md-button aria-label='Show gait sample' ng-click='showGaitSample(gait_sample)'>
+				<md-tooltip>Show sample</md-tooltip>
+				<ng-md-icon icon='open_in_new'></ng-md-icon>
+			</md-button>
+			{{gait_sample.date|date:'dd/MMM/yyyy'}} - {{gait_sample.description}}
+		</ng-content>
+	</md-list-item>
+</md-list>
+

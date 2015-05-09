@@ -1,0 +1,41 @@
+<div flex layout='row'>
+	<form name='gaitSampleForm'>
+		<md-input-container>
+			<label>Description</label>
+			<input ng-model='gait_sample.description' ng-required='true'></input>
+		</md-input-container>
+
+		<md-input-container>
+			<label>Date</label>
+			<input name='date' type="date"  ng-model="gait_sample.date" ng-required='true'/>
+		</md-input-container>
+		<md-button aria-label='Save sample' ng-click='saveSample()' ng-disabled='gaitSampleForm.$invalid'>
+			<md-tooltip>Save sample</md-tooltip>
+			<ng-md-icon icon="save" size="72" postion="br"></ng-md-icon>
+		</md-button>
+	</form>
+</div>
+<div layout='colummn' ng-hide='isAdding'>
+	<table>
+		<tr><th></th><th>Description</th><th>Initial Contact Frame</th><th>End Terminal Swing Frame</th></tr>
+		<tr ng-repeat='gait_cycle in gait_cycles'>
+			<td>
+				<input type='checkbox'>	</input>
+			</td>
+			<td align='center'>
+				{{gait_cycle.description}}
+			</td>
+			<td align='center'>
+				{{gait_cycle.initial_contact_frame}}
+			</td>
+			<td align='center'>
+				{{gait_cycle.end_terminal_swing_frame}}
+			</td>
+		</tr>
+	</table>
+	<md-button aria-label='Plot gait cycle'>
+		<md-tooltip>Plot gait cycle</md-tooltip>
+		<ng-md-icon icon='photo' size='72'></ng-md-icon>
+	</md-button>
+</div>
+
