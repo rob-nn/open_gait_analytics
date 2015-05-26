@@ -23,24 +23,3 @@ buildMockedPatients = function () {
 	}
 };
 
-buildMockedGaitSamples = function () {
-	var _gaitSamples = [];
-
-	var _addGaitSample = function(gaitSample) {
-		return _gaitSamples.push(gaitSample) - 1;
-	}
-
-	var _updateGaitSample = function(id, gaitSample) {
-		_gaitSamples[id] = gaitSample;					
-	}
-	var _get = function (id){
-		return _gaitSamples[id];
-	}
-
-	return {
-		gaitSamples : _gaitSamples,
-		addGaitSample : _addGaitSample,
-		updateSample : _updateGaitSample,
-		get: _get
-	};
-};

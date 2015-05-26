@@ -106,6 +106,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-################################################################################
-MEDIA_ROOT = '/media/'
+
+##########################################################
+PROJECT_ROOT = os.path.realpath(os.path.dirname(__file__))
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_URL = '/media/'
 CORS_ORIGIN_ALLOW_ALL = True
+REST_FRAMEWORK = {
+		'DEFAULT_PARSER_CLASSES' : ('rest_framework.parsers.FileUploadParser', )
+		}

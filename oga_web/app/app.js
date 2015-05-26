@@ -9,8 +9,6 @@ angular.module('oga_web', [
 	'oga_web.patients',
 	'oga_web.patient',
 	'oga_web.oga_facade',
-	'myApp.view1',
-	'myApp.view2',
 	'myApp.version',
 ])
 .config(['$routeProvider', function($routeProvider) {

@@ -58,13 +58,11 @@ describe('Gait Samples facade specification.', function(){
 		$httpBackend = _$httpBackend_;
 		gaitSamplesFacade = _gaitSamplesFacade_;
 		webapi = _webapi_;
-		mockedGaitSamples = buildMockedGaitSamples();
 		gaitSample = {id:0, description:'Gait sample one', date: new Date(), patient:1};
 	}));
 	
 	it ('Must add a sample gait', function(){
 		$httpBackend.whenPOST(webapi.url + 'gait_samples/').respond(function(){
-			var id = mockedGaitSamples.addGaitSample(gaitSample);
 			return [201, gaitSample, {}];	
 		});
 		gaitSamplesFacade.addGaitSample(gaitSample).success(function(data, status){
@@ -73,16 +71,17 @@ describe('Gait Samples facade specification.', function(){
 		});
 		$httpBackend.flush();
 	});
-	
 	it('Must save a gait', function(){
+		var gait_sample_updated = null;
 		$httpBackend.whenPUT(webapi.url + 'gait_samples/0/').respond(function (mehtod, url, data, headers){
-			mockedGaitSamples.updateSample(0, angular.fromJson(data));
+			gait_sample_updated = angular.fromJson(data);
 			return [204, "", {}];
 		});
 		gaitSample.description = 'new description';
-		gaitSamplesFacade.updateGaitSample(gaitSample);
+		gaitSamplesFacade.updateGaitSample(gaitSample).success(function(data, status){
+			expect(gait_sample_updated.description).toEqual('new description');
+		});
 		$httpBackend.flush();
-		expect(mockedGaitSamples.get(0).description).toEqual('new description');
 		
 	});
 

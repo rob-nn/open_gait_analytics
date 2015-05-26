@@ -12,10 +12,12 @@ module.exports = function(config){
       'app/bower_components/angular-material/angular-material.js',
       'app/bower_components/angular-material-icons/angular-material-icons.js',
       'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+      'app/bower_components/ng-file-upload/ng-file-upload.js',
+      "app/bower_components/ng-file-upload/ng-file-upload-shim.js",
       'app/components/**/*.js',
       'app/app.js',
+      'app/oga_facade/build-mocked-patients.js',
       'app/gait_analysis/**/*.js',
-      'app/oga_facade/mocks.js', //Must be loaded before tests to provide mockups
       'app/oga_facade*/**/*.js',
       'app/patient*/**/*.js'
     ],

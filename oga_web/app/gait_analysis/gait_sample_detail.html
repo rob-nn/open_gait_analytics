@@ -1,19 +1,31 @@
 <div flex layout='row'>
 	<form name='gaitSampleForm'>
-		<md-input-container>
-			<label>Description</label>
-			<input ng-model='gait_sample.description' ng-required='true'></input>
-		</md-input-container>
-
-		<md-input-container>
-			<label>Date</label>
-			<input name='date' type="date"  ng-model="gait_sample.date" ng-required='true'/>
-		</md-input-container>
+		<md-content flex layout='column'>
+			<md-input-container>
+				<label>Description</label>
+				<input ng-model='gait_sample.description' ng-required='true'></input>
+			</md-input-container>
+			<md-input-container>
+				<label>Date</label>
+				<input name='date' type="date"  ng-model="gait_sample.date" 
+					ng-required='true'/>
+			</md-input-container>
+			<md-input-container>
+				<label>QTM Data File (MATLAB Format)</label>
+			</md-input-container>
+			<input type='file' ngf-select='' ngf-change="upload($files)"/>
+		</md-content>
 		<md-button aria-label='Save sample' ng-click='saveSample()' ng-disabled='gaitSampleForm.$invalid'>
 			<md-tooltip>Save sample</md-tooltip>
 			<ng-md-icon icon="save" size="72" postion="br"></ng-md-icon>
 		</md-button>
 	</form>
+	<ul>
+		<li ng-repeat="item in uploader.queue">
+			Name: <span ng-bind="item.file.name"></span><br/>
+			<button ng-click="item.upload()">upload</button>
+		</li>
+        </ul>
 </div>
 <div layout='colummn' ng-hide='isAdding'>
 	<table>

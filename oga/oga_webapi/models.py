@@ -10,8 +10,6 @@ class GaitSample(models.Model):
     description = models.CharField(max_length=50)
     date = models.DateTimeField()
     patient = models.ForeignKey(Patient, related_name='samples')
-    file_name = models.FileField()
-    
 
 class GaitCycle(models.Model):
     descripton = models.CharField(max_length=50)

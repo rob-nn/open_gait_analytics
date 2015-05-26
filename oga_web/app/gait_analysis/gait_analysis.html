@@ -6,22 +6,32 @@
 		<md-button ng-click="close()" class="md-primary" hide-gt-md>
 			Close Side
 		</md-button>
-
 		<md-content layout-padding>
 			<h2>{{patient.name}}</h2>
 			<p>Birth Date: {{patient.birth|date:'dd/MMM/yyyy'}}</p>
-			<div ng-include src="'gait_analysis/list_samples.html'"></div>
+			<md-subheader>Gait samples.</md-subheader>
+			<md-list flex>
+				<md-list-item ng-repeat='gait_sample in patient.samples' layout='column'>
+					<ng-content>
+						<md-button aria-label='Show gait sample' ng-click='showGaitSample(gait_sample)'>
+							<md-tooltip>Show sample</md-tooltip>
+							<ng-md-icon icon='open_in_new'></ng-md-icon>
+						</md-button>
+						{{gait_sample.date|date:'dd/MMM/yyyy'}} - {{gait_sample.description}}
+					</ng-content>
+				</md-list-item>
+			</md-list>
+
 			<md-button aria-label='Add gait sample' ng-click='addGaitData()'>
 				<md-tooltip>Add gait sample</md-tooltip>
 				<ng-md-icon icon="add_circle" size="72" postion="br"></ng-md-icon>
 			</md-button>
 		</md-content>
 	</md-sidenav>
-
 	<md-content layout-padding>
 		<md-button ng-click="toggleLeft()" class="md-primary" hide-gt-md>
 			Open side	
 		</md-button>
 		<div flex ng-include src="'gait_analysis/gait_sample_detail.html'" ng-show='gaitSampleEnabled || isAdding'></div>
 	</md-content>
-</section>
+</section> 
