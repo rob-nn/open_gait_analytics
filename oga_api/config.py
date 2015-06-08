@@ -1,9 +1,10 @@
 import os
 
-
 class Config:
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     SCRET_KEY = os.environ.get('SECRET_KEY') or 'Hard to guess string'
+    DB_URI = "mongodb://localhost" 
+    DB_NAME = "oga"
     
     @staticmethod
     def init_app(app):
