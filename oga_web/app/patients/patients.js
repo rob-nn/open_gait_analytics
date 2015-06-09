@@ -12,9 +12,6 @@ angular.module('oga_web.patients', ["ngRoute", "ngMaterial", "ngMdIcons", 'oga_w
 		}
 	});
 }])
-.constant("webapi", {
-	url:  'http://localhost:8000/'
-})
 .controller('patientsCtrl', function ($rootScope, $scope, $location, patients){
 	$scope.showListViewIcon = true;
 	$scope.patients = patients.data;
@@ -30,5 +27,4 @@ angular.module('oga_web.patients', ["ngRoute", "ngMaterial", "ngMdIcons", 'oga_w
 	$scope.openGaitAnalysis = function (patient_id) {
 		$location.path('/gait_analysis/patient/' + patient_id + '/');
 	};
-
 });

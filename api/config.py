@@ -5,6 +5,7 @@ class Config:
     SCRET_KEY = os.environ.get('SECRET_KEY') or 'Hard to guess string'
     DB_URI = "mongodb://localhost" 
     DB_NAME = "oga"
+    CSRF_ENABLED=False
     
     @staticmethod
     def init_app(app):
@@ -14,7 +15,8 @@ class DevelopmentConfig(Config):
     DEBUG = True
 
 class TestingConfig(Config):
-    TEST=True
+    TESTING=True
+    SERVER_NAME = "localhost:5000"
 
 class ProductionConfig(Config):
     PRODUCTION=True

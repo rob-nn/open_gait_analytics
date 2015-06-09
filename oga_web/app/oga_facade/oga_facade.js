@@ -1,7 +1,7 @@
 'use strict';
 angular.module('oga_web.oga_facade', [])
 .constant("webapi", {
-	url:  'http://localhost:8000/'
+	url:  'http://localhost:5000/api/v0.0/'
 })
 .factory('gaitSamplesFacade', function($http, webapi) {
 	var _addGaitSample = function(sample){
