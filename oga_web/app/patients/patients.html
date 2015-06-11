@@ -14,10 +14,11 @@
 		<ng-md-icon icon="apps" size="48"></ng-md-icon>
 	</md-button>
 </md-toolbar>
-<div layout="column" flex>
-	<md-grid-list md-cols='4' md-row-height='200px' md-gutter=5>
+<div layout="column">
+	<md-grid-list md-cols='4' md-row-height='256px' md-gutter=5>
 		<md-grid-tile ng-repeat='patient in patients' ng-click='openGaitAnalysis(patient._id.$oid)'>
-			<md-grid-tile-footer>{{patient.name}}</md-grid-tile-footer>
+			<img ng-src="images/People-Patient-Male-icon.png"></img>
+			<md-grid-tile-footer><h3>{{patient.name}}</h3></md-grid-tile-footer>
 		</md-grid-tile>
 	</md-grid-list>
 	<md-button aria-label='Add Patient' class="oga-float-bottom-right" ng-click='createPatient()'>
