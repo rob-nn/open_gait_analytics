@@ -8,10 +8,10 @@ describe('Gait Analysis controller specification', function () {
 	beforeEach(module('oga_web.gait_analysis'));
 	beforeEach(module('oga_web.oga_facade'));
 
-	beforeEach(inject(function($rootScope, _$controller_, _$httpBackend_, _webapi_, _gaitSamplesFacade_){
+	beforeEach(inject(function($rootScope, _$controller_, _$httpBackend_, urlApi, _gaitSamplesFacade_){
 		$scope = $rootScope.$new();
 		$httpBackend = _$httpBackend_;
-		webapi = _webapi_;
+		webapi = urlApi.urlString();
 		gaitSamplesFacade = _gaitSamplesFacade_;
 		$controller = _$controller_;
 		patient = buildMockedPatients().getPatients()[0];
@@ -53,7 +53,7 @@ describe('Gait Analysis controller specification', function () {
 
 
 	it('Test add new gait sample', function() {
-		$httpBackend.whenPOST(webapi.url + 'gait_samples/').respond(function(){
+		$httpBackend.whenPOST(webapi + 'gait_samples/').respond(function(){
 			$scope.patient.samples.push(gait_sample);
 			return [201, gait_sample, {}];	
 		});
@@ -78,7 +78,7 @@ describe('Gait Analysis controller specification', function () {
 	});
 
 	it('Test save a gait sample.', function(){
-		$httpBackend.whenPUT(webapi.url + 'gait_samples/0/').respond(function(method, url, data, headers){
+		$httpBackend.whenPUT(webapi + 'gait_samples/0/').respond(function(method, url, data, headers){
 			$scope.patient.samples[0].description = 'new description';
 			return [204, angular.fromJson(data), {}];
 		});
@@ -86,6 +86,16 @@ describe('Gait Analysis controller specification', function () {
 		$scope.saveSample();
 		$httpBackend.flush();   
 		expect($scope.patient.samples[0].description).toEqual('new description');
+	});
+	
+	it ('Test upload a gait sample', function() {
+		var files = [new File([''], 'mocks.txt')];
+		$httpBackend.whenPOST(webapi + 'gait_sample/upload/').respond(function(method, url, data, headers){
+			expect(data).toBeDefined();
+			return [200, {mock_data: 'mockup'}, {}];
+		});
+		$scope.upload(files);
+		$httpBackend.flush();
 	});
 
 });

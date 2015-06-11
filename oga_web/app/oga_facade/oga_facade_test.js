@@ -3,15 +3,15 @@
 describe ('Patients Facade specification.',function(){
 	var patientsFacade, $httpBackend, mockedPatients, webapi;
 	beforeEach(module('oga_web.oga_facade'));
-	beforeEach(inject(function(_patientsFacade_, _$httpBackend_, _webapi_){
+	beforeEach(inject(function(_patientsFacade_, _$httpBackend_, urlApi){
 		patientsFacade = _patientsFacade_;
 		$httpBackend = _$httpBackend_;
-		webapi = _webapi_;
+		webapi = urlApi.urlString(); 
 		mockedPatients = buildMockedPatients();
 	}));
 
 	it ('Must have patients', function(){
-		$httpBackend.whenGET(webapi.url + 'patients/').respond(function(){
+		$httpBackend.whenGET(webapi + 'patients/').respond(function(){
 			return [200, mockedPatients.getPatients(), {}];	
 		});
 		patientsFacade.getPatients().success(function(data, status){
@@ -23,7 +23,7 @@ describe ('Patients Facade specification.',function(){
 	});;
 
 	it('Must find patient with id = 1', function(){
-		$httpBackend.whenGET(webapi.url + 'patients/' + 1 + '/').respond(function(){
+		$httpBackend.whenGET(webapi + 'patients/' + 1 + '/').respond(function(){
 			var patient = mockedPatients.getPatient(1);
 			return [200, patient, {}];
 		});
@@ -36,7 +36,7 @@ describe ('Patients Facade specification.',function(){
 
 	it ('Must add a patient', function(){
 		var patient = {name : 'Mary', birth:new Date(1984, 12, 1)};
-		$httpBackend.whenPOST(webapi.url + 'patients/').respond(function(){
+		$httpBackend.whenPOST(webapi + 'patients/').respond(function(){
 			var id = mockedPatients.addPatient(patient);
 			return [201, mockedPatients.getPatient(id), {}];	
 		});
@@ -54,15 +54,15 @@ describe('Gait Samples facade specification.', function(){
 	var $httpBackend, gaitSamplesFacade, webapi, mockedGaitSamples;
 	var gaitSample;
 	beforeEach(module('oga_web.oga_facade'));
-	beforeEach(inject(function(_$httpBackend_, _gaitSamplesFacade_, _webapi_){
+	beforeEach(inject(function(_$httpBackend_, _gaitSamplesFacade_, urlApi){
 		$httpBackend = _$httpBackend_;
 		gaitSamplesFacade = _gaitSamplesFacade_;
-		webapi = _webapi_;
+		webapi = urlApi.urlString(); 
 		gaitSample = {id:0, description:'Gait sample one', date: new Date(), patient:1};
 	}));
 	
 	it ('Must add a sample gait', function(){
-		$httpBackend.whenPOST(webapi.url + 'gait_samples/').respond(function(){
+		$httpBackend.whenPOST(webapi + 'gait_samples/').respond(function(){
 			return [201, gaitSample, {}];	
 		});
 		gaitSamplesFacade.addGaitSample(gaitSample).success(function(data, status){
@@ -73,7 +73,7 @@ describe('Gait Samples facade specification.', function(){
 	});
 	it('Must save a gait', function(){
 		var gait_sample_updated = null;
-		$httpBackend.whenPUT(webapi.url + 'gait_samples/0/').respond(function (mehtod, url, data, headers){
+		$httpBackend.whenPUT(webapi + 'gait_samples/0/').respond(function (mehtod, url, data, headers){
 			gait_sample_updated = angular.fromJson(data);
 			return [204, "", {}];
 		});

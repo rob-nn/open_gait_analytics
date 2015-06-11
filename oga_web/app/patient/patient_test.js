@@ -3,11 +3,11 @@
 describe('Patient controller specification.', function() {
 	var $scope, $httpBackend, $location, webapi
 	beforeEach(module('oga_web.patient'));
-	beforeEach(inject( function ($controller, $rootScope, _$location_, _$httpBackend_, _webapi_){
+	beforeEach(inject( function ($controller, $rootScope, _$location_, _$httpBackend_, urlApi){
 		$scope = $rootScope.$new();
 		$controller('patientNewCtrl', {$scope:$scope});
 		$httpBackend = _$httpBackend_;
-		webapi = _webapi_;
+		webapi = urlApi.urlString();
 		$location = _$location_
 	}));
 
@@ -16,7 +16,7 @@ describe('Patient controller specification.', function() {
 	});
 
 	it('Add a new patient', function() {
-		$httpBackend.whenPOST(webapi.url + 'patients/').respond(function(method, url, data, headers){
+		$httpBackend.whenPOST(webapi + 'patients/').respond(function(method, url, data, headers){
 			
 			return [201, {}, {}];	
 		});

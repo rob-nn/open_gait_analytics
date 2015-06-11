@@ -23,13 +23,14 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$timeout, 
 	$mdSidenav, 
 	$mdUtil, 
-	$log){
+	$log, 
+	urlApi){
 
 	$scope.upload = function(files){
 		if (files && files.length) {
 			var file = files[0];
 			Upload.upload({
-				url:'upload/url',
+				url: urlApi.urlString() + 'gait_sample/upload/',
 				fields: {'username': 'teting'},
 				file: file
 			}).progress(function (evt){

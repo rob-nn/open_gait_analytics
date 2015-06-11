@@ -1,12 +1,12 @@
-<section layout='row' felx>
-	<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
+<section layout='row' style="height:100%;" flex>
+	<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" flex>
 		<md-toolbar layout="row">
 			<h1>Gait Analysis</h1>
 		</md-toolbar>
 		<md-button ng-click="close()" class="md-primary" hide-gt-md>
 			Close Side
 		</md-button>
-		<md-content layout-padding>
+		<md-content layout-padding flex>
 			<h2>{{patient.name}}</h2>
 			<p>Birth Date: {{patient.birth|date:'dd/MMM/yyyy'}}</p>
 			<md-subheader>Gait samples.</md-subheader>
