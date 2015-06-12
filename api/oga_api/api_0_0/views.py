@@ -35,10 +35,9 @@ def patients():
 
 @main_blueprint.route('/gait_sample/upload/', methods=["POST", "GET"])
 def gait_sample_upload():
-	print 'hi'
-	stream = request.files['file'].stream
-	#for line in stream:
-	#	print line
-	#import pdb; pdb.set_trace()
-	return json_util.dumps({'data':'ok'}), 200
+	qtm_matlab_file = request.files['file'].stream
+        import oga_api.etl.qtm as qtm
+        data = qtm.readQTMFile(qtm_matlab_file)
+        del data['trajectories']
+	return json_util.dumps(data), 200
 

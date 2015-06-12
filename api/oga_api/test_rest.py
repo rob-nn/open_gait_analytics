@@ -61,3 +61,15 @@ class TestRest(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         patients = json_util.loads(r.data.decode('utf-8'))
         self.assertEqual(len(patients), 2)
+    
+    def test_gait_sample_upload(self):
+        qtm_file = open('oga_api/etl/Walk1.mat')
+        url = url_for('oga_api_0_0.gait_sample_upload')
+        r = self.client.post(url, data = {'file': (qtm_file, 'Walk1.mat'),})
+        self.assertEqual(r.status_code, 200)
+	qtm_data = json_util.loads(r.data.decode('utf-8')) 
+        self.assertEqual(qtm_data['frames'], 1491)
+        self.assertEqual(qtm_data['frame_rate'], 315)
+        self.assertEqual(qtm_data['number_markers'], 88)
+
+        
