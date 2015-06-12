@@ -71,5 +71,6 @@ class TestRest(unittest.TestCase):
         self.assertEqual(qtm_data['frames'], 1491)
         self.assertEqual(qtm_data['frame_rate'], 315)
         self.assertEqual(qtm_data['number_markers'], 88)
+	self.assertEqual(qtm_data['original_filename'], 'Walk1.mat')
 
         
