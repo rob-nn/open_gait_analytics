@@ -12,4 +12,3 @@ def readQTMFile(qtmFile):
             }
     
     return new_content
-    

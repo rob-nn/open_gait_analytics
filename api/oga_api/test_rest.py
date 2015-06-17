@@ -49,6 +49,17 @@ class TestRest(unittest.TestCase):
 	patient = json_util.loads(r.data.decode('utf-8')) 
 	self.assertEqual(patient['name'], 'Mary Jane')
 
+    def test_update_patient(self):
+	patient = {'name': 'Roberto'}
+	patient_id = self.db.patients.insert_one(patient).inserted_id
+	patient = self.db.patients.find_one({'_id': patient_id})	
+	patient['name'] = 'Roberto A. Lima'
+	r = self.client.put(url_for('oga_api_0_0.patients'), headers={'Content-Type': 'application/json'}, data = json_util.dumps(patient))
+        self.assertEqual(r.status_code, 200)
+	patient = self.db.patients.find_one({'_id': patient_id})
+	self.assertEqual(patient['name'], 'Roberto A. Lima')
+
+
     def test_get_patients(self):
         url = url_for('oga_api_0_0.patients')
         r = self.client.get(url)

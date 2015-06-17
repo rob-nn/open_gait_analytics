@@ -25,7 +25,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$mdUtil, 
 	$log, 
 	urlApi){
-
 	$scope.upload = function(files){
 		if (files && files.length) {
 			var file = files[0];
@@ -37,13 +36,13 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 				var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
 				console.log('progress: ' + progressPercentage + '% ' + evt.config.file.name);
 			}).success(function(data, status, headers, config){
+				$scope.gait_sample.data = data;
 				console.log('file ' + config.file.name + 'uploaded. Response: ' + data);
 			}).error(function(data, status, headers, config){
 				console.log('Error: ' + status);
 			});
 		}
 	};
-
 	$scope.patient = patient.data;
 	if ($scope.patient.samples) {
 		for(var i=0; i < $scope.patient.samples.length; i++){
@@ -61,7 +60,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		$scope.gaitSampleEnabled = true;
 		$scope.isAdding = false;
 	}
-
 	if ($scope.gait_sample == null){
 		if ($scope.patient.samples && $scope.patient.samples.length > 0){
 			$scope.showGaitSample($scope.patient.samples[0]);
@@ -70,7 +68,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	else {
 		$scope.showGaitSample($scope.gait_sample);
 	}
-
 	$scope.addGaitData = function() {
 		$scope.gait_sample = {patient: $scope.patient.id, date:new Date(), description:null};
 		$scope.isAdding = true;
@@ -80,7 +77,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		$scope.currentFile = element.files[0];
 	};
 	$scope.cancel = function() {
-		//reload view
 		$location.path('/gait_analysis/patient/' + $scope.patient.id + '/');
 	}
 	$scope.saveSample= function(){

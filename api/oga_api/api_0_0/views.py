@@ -20,7 +20,7 @@ def get_patient(id):
     else:
         return jsonify({'error': 'not found'}), 404 
 
-@main_blueprint.route('/patients/', methods=['GET', 'POST'])
+@main_blueprint.route('/patients/', methods=['GET', 'POST', 'PUT'])
 def patients():
     if request.method == 'GET':
 	db = get_db()
@@ -28,10 +28,16 @@ def patients():
 	return json_util.dumps(patients), 200
     else:
     	db = get_db()
-	patient = request.json
-	patient_id = db.patients.insert_one(patient).inserted_id
-	patient = db.patients.find_one({'_id': ObjectId(patient_id)})
-	return json_util.dumps(patient), 201
+	patient = json_util.loads(request.data)
+	if request.method == 'POST':
+		patient_id = db.patients.insert_one(patient).inserted_id
+		patient = db.patients.find_one({'_id': ObjectId(patient_id)})
+		return json_util.dumps(patient), 201
+	elif request.method == 'PUT':
+		print patient
+		 #import pdb; pdb.set_trace()
+		db.patients.replace_one({'_id': patient['_id']}, patient)
+		return json_util.dumps({"return": "Saved"}), 200
 
 @main_blueprint.route('/gait_sample/upload/', methods=["POST", "GET"])
 def gait_sample_upload():
@@ -41,4 +47,3 @@ def gait_sample_upload():
         del data['trajectories']
 	data['original_filename'] = qtm_matlab_file.filename
 	return json_util.dumps(data), 200
-

@@ -90,12 +90,15 @@ describe('Gait Analysis controller specification', function () {
 	
 	it ('Test upload a gait sample', function() {
 		var files = [new File([''], 'mocks.txt')];
-		$httpBackend.whenPOST(webapi + 'gait_sample/upload/').respond(function(method, url, data, headers){
+		var mock_data = {'frame_rate': 315, 'frames': 2000, 'number_marks': 20, 'original_filename': 'mocks.txt'};
+		$httpBackend.whenPOST(webapi + 'gait_sample/upload/').respond(function(method, url, data, headers) {
 			expect(data).toBeDefined();
-			return [200, {mock_data: 'mockup'}, {}];
+			return [200, mock_data, {}];
 		});
 		$scope.upload(files);
 		$httpBackend.flush();
+		expect($scope.gait_sample.data).toBeDefined();
+		expect($scope.gait_sample.data).toEqual(mock_data);
 	});
 
 });

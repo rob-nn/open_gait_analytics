@@ -12,20 +12,34 @@
 			</md-input-container>
 			<md-input-container>
 				<label>QTM Data File (MATLAB Format)</label>
+				<input type='file' ngf-select='' ngf-change="upload($files)"></input>
 			</md-input-container>
-			<input type='file' ngf-select='' ngf-change="upload($files)"/>
 		</md-content>
+		<md-content flex layout="row" ng-show='gait_sample.data'>
+			<md-input-container>
+				<label>Filename</label>
+				<input ng-model='gait_sample.data.original_filename' ng-disabled="true"></input>
+			</md-input-container>
+			<md-input-container>
+				<label>Frames</label>
+				<input ng-model='gait_sample.data.frames' ng-disabled="true"></input>
+			</md-input-container>
+			<md-input-container>
+				<label>Frame Rate</label>
+				<input ng-model='gait_sample.data.frame_rate' ng-disabled="true"></input>
+			</md-input-container>
+			<md-input-container>
+				<label>Markers</label>
+				<input ng-model='gait_sample.data.number_markers' ng-disabled="true"></input>
+			</md-input-container>
+
+		</md-content>
+
 		<md-button aria-label='Save sample' ng-click='saveSample()' ng-disabled='gaitSampleForm.$invalid'>
 			<md-tooltip>Save sample</md-tooltip>
 			<ng-md-icon icon="save" size="72" postion="br"></ng-md-icon>
 		</md-button>
 	</form>
-	<ul>
-		<li ng-repeat="item in uploader.queue">
-			Name: <span ng-bind="item.file.name"></span><br/>
-			<button ng-click="item.upload()">upload</button>
-		</li>
-        </ul>
 </div>
 <div layout='colummn' ng-hide='isAdding'>
 	<table>
@@ -50,4 +64,3 @@
 		<ng-md-icon icon='photo' size='72'></ng-md-icon>
 	</md-button>
 </div>
-
