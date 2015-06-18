@@ -59,7 +59,6 @@ class TestRest(unittest.TestCase):
 	patient = self.db.patients.find_one({'_id': patient_id})
 	self.assertEqual(patient['name'], 'Roberto A. Lima')
 
-
     def test_get_patients(self):
         url = url_for('oga_api_0_0.patients')
         r = self.client.get(url)
@@ -83,5 +82,10 @@ class TestRest(unittest.TestCase):
         self.assertEqual(qtm_data['frame_rate'], 315)
         self.assertEqual(qtm_data['number_markers'], 88)
 	self.assertEqual(qtm_data['original_filename'], 'Walk1.mat')
+	self.assertEqual(len(qtm_data['markers']), 88)
+	for marker in qtm_data['markers']:
+		self.assertEqual(marker, '')
+	#import numpy as np
+	#print np.array(qtm_data['trajectories']).shape
+	print r.data[:79]
 
-        

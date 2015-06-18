@@ -38,10 +38,10 @@ describe ('Patients Facade specification.',function(){
 		var patient = {name : 'Mary', birth:new Date(1984, 12, 1)};
 		$httpBackend.whenPOST(webapi + 'patients/').respond(function(){
 			var id = mockedPatients.addPatient(patient);
-			return [201, mockedPatients.getPatient(id), {}];	
+			return [201, mockedPatients.getPatient(id -1), {}];	
 		});
 		patientsFacade.addPatient(patient).success(function(data, status){
-			expect(data).toEqual(patient);
+			expect(data.name).toEqual(patient.name);
 			expect(status).toEqual(201);
 		});
 		$httpBackend.flush();
@@ -49,33 +49,18 @@ describe ('Patients Facade specification.',function(){
 	});
 
 	it('Must update a patient', function (){
-		var patient = {name: 'Mary', birth = new Date(1984, 12, 5)};
-		$httpBackend.whenPUT((webapi + 'patients/').respond(function () {	
-			return [200, {}, {}];
+		var patient = {_id: {$oid: 1} , name : 'Mary', birth:new Date(1984, 12, 1)};
+		$httpBackend.whenPUT(webapi + 'patients/').respond(function(method, url, data){
+			var d = JSON.parse(data);
+			expect(d["_id"]).toEqual(patient._id);
+			return [200,  {}, {}]
+		});
+
+		patientsFacade.updatePatient(patient).success(function(data, status){
+			expect(status).toEqual(200);	
 		});
 		$httpBackend.flush();
 	});
 });
 
-describe('Gait Samples facade specification.', function(){
-	var $httpBackend, gaitSamplesFacade, webapi, mockedGaitSamples;
-	var gaitSample;
-	beforeEach(module('oga_web.oga_facade'));
-	beforeEach(inject(function(_$httpBackend_, _gaitSamplesFacade_, urlApi){
-		$httpBackend = _$httpBackend_;
-		gaitSamplesFacade = _gaitSamplesFacade_;
-		webapi = urlApi.urlString(); 
-		gaitSample = {id:0, description:'Gait sample one', date: new Date(), patient:1};
-	}));
-	it ('Must add a sample gait', function(){
-		$httpBackend.whenPOST(webapi + 'gait_samples/').respond(function(){
-			return [201, gaitSample, {}];	
-		});
-		gaitSamplesFacade.addGaitSample(gaitSample).success(function(data, status){
-			expect(data).toEqual(gaitSample);
-			expect(status).toEqual(201);
-		});
-		$httpBackend.flush();
-	});
-});
 

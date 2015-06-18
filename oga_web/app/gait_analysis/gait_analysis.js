@@ -11,7 +11,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 				return patientsFacade.getPatient(id);
 			}
 		}
-	})
+	});
 }])
 .controller('gaitAnalysisCtrl', function (
 	$rootScope, 
@@ -19,12 +19,32 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$location, 
 	patient, 
 	Upload,
-	gaitSamplesFacade, 
 	$timeout, 
 	$mdSidenav, 
 	$mdUtil, 
 	$log, 
-	urlApi){
+	urlApi,
+	patientsFacade){
+
+	$scope.patient = patient.data;
+	$scope.isAdding = false;
+	$scope.gaitSampleEnabled = false;
+	$scope.gait_sample = null;
+	$scope.isShowMarkers = false;
+
+	$scope.showGaitSample = function(gait_sample) {
+		$scope.gait_sample = gait_sample;
+		$scope.gaitSampleEnabled = true;
+		$scope.isAdding = false;
+	}
+	if ($scope.gait_sample == null){
+		if ($scope.patient.gait_samples && $scope.patient.gait_samples.length > 0){
+			$scope.showGaitSample($scope.patient.gait_samples[0]);
+		}
+	}
+	else {
+		$scope.showGaitSample($scope.gait_sample);
+	}
 	$scope.upload = function(files){
 		if (files && files.length) {
 			var file = files[0];
@@ -43,35 +63,11 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			});
 		}
 	};
-	$scope.patient = patient.data;
-	if ($scope.patient.samples) {
-		for(var i=0; i < $scope.patient.samples.length; i++){
-			$scope.patient.samples[i].date = new Date($scope.patient.samples[i].date);
-		}
-	}
-	$scope.isAdding = false;
-	$scope.gaitSampleEnabled = false;
-	$scope.gait_sample = null;
-	$scope.gait_cycles = [
-		{id:1, description: 'xxxxxxx', initial_contact_frame:'10', end_terminal_swing_frame:'100'},
-	];
-	$scope.showGaitSample = function(gait_sample) {
-		$scope.gait_sample = gait_sample;
-		$scope.gaitSampleEnabled = true;
-		$scope.isAdding = false;
-	}
-	if ($scope.gait_sample == null){
-		if ($scope.patient.samples && $scope.patient.samples.length > 0){
-			$scope.showGaitSample($scope.patient.samples[0]);
-		}
-	}
-	else {
-		$scope.showGaitSample($scope.gait_sample);
-	}
 	$scope.addGaitData = function() {
-		$scope.gait_sample = {patient: $scope.patient.id, date:new Date(), description:null};
+		$scope.gait_sample = {date:new Date(), description:null};
 		$scope.isAdding = true;
 		$scope.gaitSampleEnabled = false;
+		$scope.isShowMarkers = false;
 	};
 	$scope.setFile = function (element) {
 		$scope.currentFile = element.files[0];
@@ -81,21 +77,17 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	}
 	$scope.saveSample= function(){
 		if ($scope.isAdding){
-			gaitSamplesFacade.addGaitSample($scope.gait_sample).success(function (data, status, headers, config) {
-				$location.path('/gait_analysis/patient/' + $scope.patient.id + '/');
-			})
-			.error(function(data, status, headers, config){
-				alert('Error: '+status + ' Data: ' + angular.fromJson(data));
-			});
-		} else {
-			gaitSamplesFacade.updateGaitSample($scope.gait_sample).success(function(data, status, headers, config) {
-				var x;
-				x = 'abc';
-			})
-			.error(function(data, status, headers, config){
-				alert('Error: '+status + ' Data: ' + angular.fromJson(data));
-			});
+			if (typeof($scope.patient.gait_samples) === 'undefined')
+				$scope.patient.gait_samples = [];
+			$scope.patient.gait_samples.push($scope.gait_sample);
 		}
+		patientsFacade.updatePatient($scope.patient).success(function (data, status, headers, config) {
+			$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid  + '/');
+		})
+		.error(function(data, status, headers, config){
+			$scope.patient.gait_samples.pop();
+			//alert('Error: '+status + ' Data: ' + angular.fromJson(data));
+		});
 	};
 	$scope.toggleLeft = buildToggler('left');
 	/**
@@ -118,4 +110,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			//$log.debug("close LEFT is done");
 		});
 	};
+	$scope.showMarkers= function () {
+		$scope.isShowMarkers = !$scope.isShowMarkers;
+	}
 });

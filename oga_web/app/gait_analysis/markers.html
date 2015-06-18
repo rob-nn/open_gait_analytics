@@ -1,0 +1,15 @@
+<div flex layout='column'>
+	<h3>Markers Names</h3>
+	<form name='markersForm'>
+		<md-content flex layou='column' ng-repeat='marker in gait_sample.data.markers track by $index'>
+			<md-input-container>
+				<label>Marker {{$index}}</label>
+				<input ng-model='gait_sample.data.markers[$index]'></input>
+			</md-input-container>
+		</md-content>
+	</form>
+	<md-button aria-label='Save' ng-click='saveSample()'>
+		<md-tooltip>Save</md-tooltip>
+		<ng-md-icon icon="save" size="72" postion="br"></ng-md-icon>
+	</md-button>
+</div>

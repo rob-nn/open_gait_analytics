@@ -1,6 +1,6 @@
 'use strict';
 describe('Gait Analysis controller specification', function () {
-	var $scope, mockedSamples, $httpBackend, webapi, gaitSamplesFacade;
+	var $scope, mockedSamples, $httpBackend, $location, webapi;
 	var $controller;
 	var gait_sample;
 	var patient;
@@ -8,16 +8,16 @@ describe('Gait Analysis controller specification', function () {
 	beforeEach(module('oga_web.gait_analysis'));
 	beforeEach(module('oga_web.oga_facade'));
 
-	beforeEach(inject(function($rootScope, _$controller_, _$httpBackend_, urlApi, _gaitSamplesFacade_){
+	beforeEach(inject(function($rootScope, _$controller_, _$httpBackend_, _$location_, urlApi){
 		$scope = $rootScope.$new();
 		$httpBackend = _$httpBackend_;
+		$location = _$location_;
 		webapi = urlApi.urlString();
-		gaitSamplesFacade = _gaitSamplesFacade_;
 		$controller = _$controller_;
 		patient = buildMockedPatients().getPatients()[0];
-		patient.samples = [];
+		patient.gait_samples = [];
 		gait_sample = {id:0, date: new Date(2010, 1, 1), description: 'testing'};
-		patient.samples.push(gait_sample);
+		patient.gait_samples.push(gait_sample);
 		var patient_ = {data:patient};
 		$controller('gaitAnalysisCtrl', {$scope:$scope, patient:patient_});
 	}));
@@ -27,11 +27,12 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.isAdding).toEqual(false);
 		expect($scope.gaitSampleEnabled).toEqual(true);
 		expect($scope.gait_sample).toBeDefined();
-		expect($scope.patient.samples).toBeDefined();
+		expect($scope.patient.gait_samples).toBeDefined();
+		expect($scope.isShowMarkers).toBe(false);
 	};
 
 	it('Test initial state without gait samples', function () {
-		$scope.patient.samples.pop();
+		$scope.patient.gait_samples.pop();
 		$controller('gaitAnalysisCtrl', {$scope:$scope, patient:{data: $scope.patient}});
 		expect($scope.gait_sample).toBeDefined();
 		expect($scope.gaitSampleEnabled).toEqual(false);
@@ -48,25 +49,37 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.gaitSampleEnabled).toEqual(false);
 		expect($scope.gait_sample).toBeDefined();
 		expect($scope.gait_sample.patient).toEqual($scope.patient.id);
-		expect($scope.patient.samples).toBeDefined();
+		expect($scope.patient.gait_samples).toBeDefined();
+		expect($scope.isShowMarkers).toEqual(false);
+	});
+	it('Test add gait sample state after edit markers', function(){
+		$scope.addGaitData();
+		expect($scope.isShowMarkers).toEqual(false);
+		$scope.showMarkers();
+		$scope.addGaitData();
+		expect($scope.isShowMarkers).toEqual(false);
 	});
 
-
 	it('Test add new gait sample', function() {
-		$httpBackend.whenPOST(webapi + 'gait_samples/').respond(function(){
-			$scope.patient.samples.push(gait_sample);
-			return [201, gait_sample, {}];	
+		$httpBackend.whenPUT(webapi + 'patients/').respond(function(method, url, data, headers){
+			var d = JSON.parse(data);
+			expect(d.gait_samples).toBeDefined();
+			expect(d.gait_samples.length).toEqual(1);
+			return [204, angular.fromJson(data), {}];
 		});
 		$scope.addGaitData();
+		delete $scope.patient.gait_samples;
+		expect($scope.patient.gait_samples).toBeUndefined();
 		$scope.saveSample();
 		$httpBackend.flush();
-		expect($scope.patient.samples.length).toEqual(2);
+		expect($scope.patient.gait_samples).toBeDefined();
+		expect($scope.patient.gait_samples.length).toEqual(1);
+		expect($location.path()).toBe('/gait_analysis/patient/' + $scope.patient._id.$oid + '/');
 	});
 
 	it('Test gait sample is undefined and thera gait samples', function(){
 		expect($scope.gait_sample).toBeDefined(); 
 	});
-
 
 	it('Test show gait sample.', function(){
 		$scope.showGaitSample(gait_sample);	
@@ -74,7 +87,7 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.isAdding).toEqual(false);
 		expect($scope.gaitSampleEnabled).toEqual(true);
 		expect($scope.gait_sample).toEqual(gait_sample);
-		expect($scope.patient.samples.length).toBe(1);
+		expect($scope.patient.gait_samples.length).toBe(1);
 	});
 
 	it('Test save a gait sample.', function(){
@@ -84,8 +97,8 @@ describe('Gait Analysis controller specification', function () {
 		});
 		$scope.showGaitSample(gait_sample);
 		$scope.saveSample();
-		$httpBackend.flush();   
-		expect($scope.patient.samples[0].description).toEqual('new description');
+		//$httpBackend.flush();   
+		//expect($scope.patient.samples[0].description).toEqual('new description');
 	});
 	
 	it ('Test upload a gait sample', function() {
@@ -99,6 +112,11 @@ describe('Gait Analysis controller specification', function () {
 		$httpBackend.flush();
 		expect($scope.gait_sample.data).toBeDefined();
 		expect($scope.gait_sample.data).toEqual(mock_data);
+	});
+
+	it('Test showmarkers', function () {
+		$scope.showMarkers()
+		expect($scope.isShowMarkers).toBe(true);
 	});
 
 });

@@ -1,6 +1,6 @@
-<div flex layout='row'>
+<div flex layout='column'>
 	<form name='gaitSampleForm'>
-		<md-content flex layout='column'>
+		<md-content flex layout='row'>
 			<md-input-container>
 				<label>Description</label>
 				<input ng-model='gait_sample.description' ng-required='true'></input>
@@ -8,59 +8,40 @@
 			<md-input-container>
 				<label>Date</label>
 				<input name='date' type="date"  ng-model="gait_sample.date" 
-					ng-required='true'/>
+					ng-required='false'/>
 			</md-input-container>
-			<md-input-container>
+			<md-input-container ng-show='isAdding'>
 				<label>QTM Data File (MATLAB Format)</label>
-				<input type='file' ngf-select='' ngf-change="upload($files)"></input>
+				<input ng-required='true' type='file' ngf-select='' ngf-change="upload($files)"></input>
 			</md-input-container>
+			<md-button aria-label='Save sample' ng-click='saveSample()' ng-disabled='gaitSampleForm.$invalid'>
+				<md-tooltip>Save sample</md-tooltip>
+				<ng-md-icon icon="save" size="72" postion="bl"></ng-md-icon>
+			</md-button>
 		</md-content>
-		<md-content flex layout="row" ng-show='gait_sample.data'>
-			<md-input-container>
-				<label>Filename</label>
-				<input ng-model='gait_sample.data.original_filename' ng-disabled="true"></input>
-			</md-input-container>
-			<md-input-container>
-				<label>Frames</label>
-				<input ng-model='gait_sample.data.frames' ng-disabled="true"></input>
-			</md-input-container>
-			<md-input-container>
-				<label>Frame Rate</label>
-				<input ng-model='gait_sample.data.frame_rate' ng-disabled="true"></input>
-			</md-input-container>
-			<md-input-container>
-				<label>Markers</label>
-				<input ng-model='gait_sample.data.number_markers' ng-disabled="true"></input>
-			</md-input-container>
-
-		</md-content>
-
-		<md-button aria-label='Save sample' ng-click='saveSample()' ng-disabled='gaitSampleForm.$invalid'>
-			<md-tooltip>Save sample</md-tooltip>
-			<ng-md-icon icon="save" size="72" postion="br"></ng-md-icon>
-		</md-button>
 	</form>
+	<md-content flex layout="row" ng-show='gait_sample.data'>
+		<md-input-container>
+			<label>Filename</label>
+			<input ng-model='gait_sample.data.original_filename' ng-disabled="true"></input>
+		</md-input-container>
+		<md-input-container>
+			<label>Frames</label>
+			<input ng-model='gait_sample.data.frames' ng-disabled="true"></input>
+		</md-input-container>
+		<md-input-container>
+			<label>Frame Rate</label>
+			<input ng-model='gait_sample.data.frame_rate' ng-disabled="true"></input>
+		</md-input-container>
+		<md-input-container>
+			<label>Markers</label>
+			<input ng-model='gait_sample.data.number_markers' ng-disabled="true"></input>
+		</md-input-container>
+		<md-button aria-label='Name markers' ng-click='showMarkers()'>
+			<md-tooltip>Name markers</md-tooltip>
+			<ng-md-icon icon="assignment" size="72" postion="br"></ng-md-icon>
+		</md-button>
+	</md-content>
+
 </div>
-<div layout='colummn' ng-hide='isAdding'>
-	<table>
-		<tr><th></th><th>Description</th><th>Initial Contact Frame</th><th>End Terminal Swing Frame</th></tr>
-		<tr ng-repeat='gait_cycle in gait_cycles'>
-			<td>
-				<input type='checkbox'>	</input>
-			</td>
-			<td align='center'>
-				{{gait_cycle.description}}
-			</td>
-			<td align='center'>
-				{{gait_cycle.initial_contact_frame}}
-			</td>
-			<td align='center'>
-				{{gait_cycle.end_terminal_swing_frame}}
-			</td>
-		</tr>
-	</table>
-	<md-button aria-label='Plot gait cycle'>
-		<md-tooltip>Plot gait cycle</md-tooltip>
-		<ng-md-icon icon='photo' size='72'></ng-md-icon>
-	</md-button>
-</div>
+

@@ -5,6 +5,7 @@ from flask.json import jsonify
 from pymongo import MongoClient
 from bson import json_util, ObjectId
 from flask.ext.cors import cross_origin
+import numpy as np
 
 def get_db():
     connection = MongoClient(current_app.config['DB_URI'])
@@ -34,7 +35,6 @@ def patients():
 		patient = db.patients.find_one({'_id': ObjectId(patient_id)})
 		return json_util.dumps(patient), 201
 	elif request.method == 'PUT':
-		print patient
 		 #import pdb; pdb.set_trace()
 		db.patients.replace_one({'_id': patient['_id']}, patient)
 		return json_util.dumps({"return": "Saved"}), 200
@@ -44,6 +44,10 @@ def gait_sample_upload():
         qtm_matlab_file = request.files['file']
         import oga_api.etl.qtm as qtm
         data = qtm.readQTMFile(qtm_matlab_file.stream)
-        del data['trajectories']
+        data['trajectories'] = np.nan_to_num(data['trajectories'])
 	data['original_filename'] = qtm_matlab_file.filename
-	return json_util.dumps(data), 200
+	markers = [];
+	for i in range(data['number_markers']):
+		markers.append('')
+	data['markers'] = markers
+	return json_util.dumps(data, allow_nan=False), 200

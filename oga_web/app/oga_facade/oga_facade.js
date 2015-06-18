@@ -3,15 +3,6 @@ angular.module('oga_web.oga_facade', [])
 .factory('urlApi', function($http, $location) {
 	return {'urlString': function() {return 'http://' + $location.host() + ':5000/api/v0.0/'}};	
 })
-.factory('gaitSamplesFacade', function($http, urlApi) {
-	var _addGaitSample = function(sample){
-		return $http.post(urlApi.urlString() + 'gait_samples/', sample);
-	}
-
-	return {
-		addGaitSample: _addGaitSample,
-	};
-})
 .factory('patientsFacade', function($http, urlApi){
 	var _getPatient = function(id) {
 		return $http.get(urlApi.urlString() + 'patients/' + id + '/');
@@ -24,7 +15,7 @@ angular.module('oga_web.oga_facade', [])
 	};
 
 	var _updatePatient = function(patient) {
-		return $http.put(urlApi.urlString() + 'patients/', patient);
+		return $http.put(urlApi.urlString() + 'patients/',  patient);
 	};
 	return {
 		getPatients: _getPatients,
