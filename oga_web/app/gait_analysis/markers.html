@@ -1,11 +1,15 @@
 <div flex layout='column'>
 	<h3>Markers Names</h3>
 	<form name='markersForm'>
-		<md-content flex layou='column' ng-repeat='marker in gait_sample.data.markers track by $index'>
+		<md-content flex layout='row' ng-repeat='marker in gait_sample.data.markers track by $index'>
 			<md-input-container>
 				<label>Marker {{$index}}</label>
 				<input ng-model='gait_sample.data.markers[$index]'></input>
 			</md-input-container>
+			<md-button aria-label='View graphic' ng-click='showGraphic($index)'> 
+				<md-tooltip>View graphic</md-tooltip>
+				<ng-md-icon icon="image" size="72"></ng-md-icon>
+			</md-button>
 		</md-content>
 	</form>
 	<md-button aria-label='Save' ng-click='saveSample()'>

@@ -32,6 +32,13 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.gait_sample = null;
 	$scope.isShowMarkers = false;
 
+	$scope.showGraphic = showGraphic;
+	
+	function showGraphic (selected_marker) {
+		marker = $scope.gait_sample.data.markers[selected_marker];
+		
+	}
+
 	$scope.showGaitSample = function(gait_sample) {
 		$scope.gait_sample = gait_sample;
 		$scope.gaitSampleEnabled = true;

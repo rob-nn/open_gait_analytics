@@ -100,7 +100,7 @@ describe('Gait Analysis controller specification', function () {
 		//$httpBackend.flush();   
 		//expect($scope.patient.samples[0].description).toEqual('new description');
 	});
-	
+
 	it ('Test upload a gait sample', function() {
 		var files = [new File([''], 'mocks.txt')];
 		var mock_data = {'frame_rate': 315, 'frames': 2000, 'number_marks': 20, 'original_filename': 'mocks.txt'};
@@ -117,6 +117,9 @@ describe('Gait Analysis controller specification', function () {
 	it('Test showmarkers', function () {
 		$scope.showMarkers()
 		expect($scope.isShowMarkers).toBe(true);
+	});
+
+	it('Test show gait sample', function(){
 	});
 
 });
