@@ -17,10 +17,15 @@ angular.module('oga_web.oga_facade', [])
 	var _updatePatient = function(patient) {
 		return $http.put(urlApi.urlString() + 'patients/',  patient);
 	};
+
+	var _showGraph = function(){
+		return $http.get(urlApi.urlString() + 'concept/graph');
+	}
 	return {
 		getPatients: _getPatients,
 		getPatient: _getPatient,
 		addPatient: _addPatient,
-		updatePatient: _updatePatient
+		updatePatient: _updatePatient,
+		showGraph: _showGraph 
 	};
 });

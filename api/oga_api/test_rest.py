@@ -2,9 +2,12 @@ import unittest
 from . import create_app, get_db_connection
 from bson import json_util
 from flask import current_app, url_for
+import numpy as np
 
 class TestRest(unittest.TestCase):
+
     db = None
+
     def setUp(self):
 	self.app = create_app('testing')
 	self.app_context = self.app.app_context()
@@ -71,21 +74,35 @@ class TestRest(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         patients = json_util.loads(r.data.decode('utf-8'))
         self.assertEqual(len(patients), 2)
-    
-    def test_gait_sample_upload(self):
-        qtm_file = open('oga_api/etl/Walk1.mat')
-        url = url_for('oga_api_0_0.gait_sample_upload')
-        r = self.client.post(url, data = {'file': (qtm_file, 'Walk1.mat'),})
-        self.assertEqual(r.status_code, 200)
-	qtm_data = json_util.loads(r.data.decode('utf-8')) 
-        self.assertEqual(qtm_data['frames'], 1491)
-        self.assertEqual(qtm_data['frame_rate'], 315)
-        self.assertEqual(qtm_data['number_markers'], 88)
-	self.assertEqual(qtm_data['original_filename'], 'Walk1.mat')
-	self.assertEqual(len(qtm_data['markers']), 88)
-	for marker in qtm_data['markers']:
-		self.assertEqual(marker, '')
-	#import numpy as np
-	#print np.array(qtm_data['trajectories']).shape
-	print r.data[:79]
+	''' 
+	    def test_gait_sample_upload(self):
+		qtm_file = open('oga_api/etl/Walk1.mat')
+		url = url_for('oga_api_0_0.gait_sample_upload')
+		r = self.client.post(url, data = {'file': (qtm_file, 'Walk1.mat'),})
+		self.assertEqual(r.status_code, 200)
+		qtm_data = json_util.loads(r.data.decode('utf-8')) 
+		self.assertEqual(qtm_data['frames'], 1491)
+		self.assertEqual(qtm_data['frame_rate'], 315)
+		self.assertEqual(qtm_data['number_markers'], 88)
+		self.assertEqual(qtm_data['original_filename'], 'Walk1.mat')
+		self.assertEqual(len(qtm_data['markers']), 88)
+		for marker in qtm_data['markers']:
+			self.assertEqual(marker, '')
+		#import numpy as np
+		#print np.array(qtm_data['trajectories']).shape
+		print r.data[:79]
+	'''
+    def test_plot_marker_invalid(self) :
+	patient_id = self.db.patients.insert_one({'name': 'roberto'}).inserted_id
+	url = url_for('oga_api_0_0.plot_marker', id = patient_id, sample_index = 0, marker_index =0)
+	r = self.client.get(url)
+	self.assertEqual(r.status_code, 404)
 
+    def test_plot_marker_invalid_index(self) :
+	trajectories = np.arange(27).reshape((3,3,3))
+	gait_sample = {'data': {'trajectories': trajectories}}
+	patient = {'name': 'roberto', 'gait_samples': [sample]}
+	patient_id = self.db.patients.insert_one(patient).inserted_id
+	url = url_for('oga_api_0_0.plot_marker', id = patient_id, sample_index = 1, marker_index =0)
+	r = self.client.get(url)
+	self.assertEqual(r.status_code, 404)

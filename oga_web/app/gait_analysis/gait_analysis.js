@@ -17,6 +17,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$rootScope, 
 	$scope, 
 	$location, 
+	$sce,
 	patient, 
 	Upload,
 	$timeout, 
@@ -35,8 +36,15 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.showGraphic = showGraphic;
 	
 	function showGraphic (selected_marker) {
-		marker = $scope.gait_sample.data.markers[selected_marker];
+		var marker = $scope.gait_sample.data.markers[selected_marker];
+		patientsFacade.showGraph().success(function (data, status, headers, config) {
 		
+			var myWindow = window.open("empty.html", "MsgWindow", "width=750, height=750");
+			myWindow.document.write(data);
+			//$scope.graphResponse = $sce.trustAsHtml(data);
+		}).error(function(data, status, headers, config){
+				console.log('Error: ' + status);
+		});
 	}
 
 	$scope.showGaitSample = function(gait_sample) {

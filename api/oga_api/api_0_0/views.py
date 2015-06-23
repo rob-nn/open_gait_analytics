@@ -51,3 +51,40 @@ def gait_sample_upload():
 		markers.append('')
 	data['markers'] = markers
 	return json_util.dumps(data, allow_nan=False), 200
+
+@main_blueprint.route('/concept/graph')
+def get_graph():
+    import matplotlib.pyplot as plt, mpld3
+    from mpl_toolkits.mplot3d import axes3d
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    x= y= z = np.arange(10)
+    ax.plot_wireframe(x,y,z)
+    mpld3.show()
+    html_str = mpld3.fig_to_html(fig)
+    return html_str
+
+@main_blueprint.route('/gait_sample/<id>/<sample_index>/<marker_index>')
+def plot_marker(id, sample_index, marker_index):
+    sample_index = int(sample_index)
+    db = get_db()
+    patient = db.patients.find_one({'_id': ObjectId(id)})
+    if not patient:
+        return jsonify({'error': 'Patient not found. Oid:' + id}), 404 
+    if  'gait_samples' not in patient.keys() or sample_index >= len(patient['gait_samples'] ):
+        return jsonify({'error': 'Gait sample index ' + str(sample_index) + ' for  Oid:' + id + ' not found.'}), 404 
+  
+    import matplotlib.pyplot as plt, mpld3
+
+    gait_sample = patient['gait_samples'][sample_index]
+    x =  gait_sample['data']['trajectories'][maker_index, 0, :]
+    y =  gait_sample['data']['trajectories'][maker_index, 1, :]
+    z =  gait_sample['data']['trajectories'][maker_index, 2, :]
+ 
+    fig = plt.figure()
+    plt.plot(x, y, z)
+    plt.show()
+    html_string= mpld3.fig_to_html(fig)
+
+    return html_string
