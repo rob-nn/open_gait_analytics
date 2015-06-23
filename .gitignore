@@ -3,6 +3,7 @@ octave-workspace
 *~
 .DS_Store
 *.swp
+*.swo
 *.pyc
 *.prof*
 oga/static/bower_components
