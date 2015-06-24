@@ -61,6 +61,14 @@ describe ('Patients Facade specification.',function(){
 		});
 		$httpBackend.flush();
 	});
+	it('Must plot marker', function (){
+		$httpBackend.whenGET(webapi + 'gait_sample/1/2/3/').respond(function(method, url, data){
+			return [200, {}, {}]
+		});
+
+		patientsFacade.plotMarker(1, 2, 3).success(function(data, status) {
+			expect(status).toEqual(200);
+		});
+		$httpBackend.flush();
+	});
 });
-
-

@@ -36,12 +36,10 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.showGraphic = showGraphic;
 	
 	function showGraphic (selected_marker) {
-		var marker = $scope.gait_sample.data.markers[selected_marker];
-		patientsFacade.showGraph().success(function (data, status, headers, config) {
-		
+		var sample_index = $scope.patient.gait_samples.indexOf($scope.gait_sample);
+		patientsFacade.plotMarker($scope.patient._id.$oid, sample_index, selected_marker).success(function (data, status, headers, config) {
 			var myWindow = window.open("empty.html", "MsgWindow", "width=750, height=750");
 			myWindow.document.write(data);
-			//$scope.graphResponse = $sce.trustAsHtml(data);
 		}).error(function(data, status, headers, config){
 				console.log('Error: ' + status);
 		});
@@ -88,7 +86,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		$scope.currentFile = element.files[0];
 	};
 	$scope.cancel = function() {
-		$location.path('/gait_analysis/patient/' + $scope.patient.id + '/');
+		$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid + '/');
 	}
 	$scope.saveSample= function(){
 		if ($scope.isAdding){

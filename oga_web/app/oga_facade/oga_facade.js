@@ -21,11 +21,17 @@ angular.module('oga_web.oga_facade', [])
 	var _showGraph = function(){
 		return $http.get(urlApi.urlString() + 'concept/graph');
 	}
+
+	var _plotMarker = function (id, sample, marker) {
+		return $http.get(urlApi.urlString() + 'gait_sample/' + id + '/' + sample + '/' + marker + '/')
+	}
+
 	return {
 		getPatients: _getPatients,
 		getPatient: _getPatient,
 		addPatient: _addPatient,
 		updatePatient: _updatePatient,
-		showGraph: _showGraph 
+		showGraph: _showGraph , 
+		plotMarker: _plotMarker
 	};
 });
