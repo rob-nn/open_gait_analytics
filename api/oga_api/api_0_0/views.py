@@ -55,19 +55,17 @@ def gait_sample_upload():
 @main_blueprint.route('/concept/graph')
 def get_graph():
     import matplotlib.pyplot as plt, mpld3
-    from mpl_toolkits.mplot3d import axes3d
-
     fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
     x= y= z = np.arange(10)
-    ax.plot_wireframe(x,y,z)
-    mpld3.show()
+    plt.plot(x)
     html_str = mpld3.fig_to_html(fig)
     return html_str
 
-@main_blueprint.route('/gait_sample/<id>/<sample_index>/<marker_index>')
+@main_blueprint.route('/gait_sample/<id>/<sample_index>/<marker_index>/', methods=['GET'])
 def plot_marker(id, sample_index, marker_index):
+    #import pdb; pdb.set_trace()
     sample_index = int(sample_index)
+    marker_index = int(marker_index)
     db = get_db()
     patient = db.patients.find_one({'_id': ObjectId(id)})
     if not patient:
@@ -75,16 +73,17 @@ def plot_marker(id, sample_index, marker_index):
     if  'gait_samples' not in patient.keys() or sample_index >= len(patient['gait_samples'] ):
         return jsonify({'error': 'Gait sample index ' + str(sample_index) + ' for  Oid:' + id + ' not found.'}), 404 
   
-    import matplotlib.pyplot as plt, mpld3
-
     gait_sample = patient['gait_samples'][sample_index]
-    x =  gait_sample['data']['trajectories'][maker_index, 0, :]
-    y =  gait_sample['data']['trajectories'][maker_index, 1, :]
-    z =  gait_sample['data']['trajectories'][maker_index, 2, :]
+    x =  gait_sample['data']['trajectories'][marker_index][0]
+    y =  gait_sample['data']['trajectories'][marker_index][1]
+    z =  gait_sample['data']['trajectories'][marker_index][2]
  
+    import matplotlib.pyplot as plt, mpld3
     fig = plt.figure()
-    plt.plot(x, y, z)
-    plt.show()
-    html_string= mpld3.fig_to_html(fig)
+    plt.plot(x, 'r')
+    plt.plot(y, 'b')
+    plt.plot(z, 'g')
+    html_str = mpld3.fig_to_html(fig)
+    return html_str, 200
 
-    return html_string
+
