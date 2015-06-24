@@ -39,19 +39,56 @@ def patients():
 		db.patients.replace_one({'_id': patient['_id']}, patient)
 		return json_util.dumps({"return": "Saved"}), 200
 
-@main_blueprint.route('/gait_sample/upload/', methods=["POST", "GET"])
-def gait_sample_upload():
-        qtm_matlab_file = request.files['file']
-        import oga_api.etl.qtm as qtm
-        data = qtm.readQTMFile(qtm_matlab_file.stream)
-        data['trajectories'] = np.nan_to_num(data['trajectories'])
-	data['original_filename'] = qtm_matlab_file.filename
-	markers = [];
-	for i in range(data['number_markers']):
-		markers.append('')
-	data['markers'] = markers
-	return json_util.dumps(data, allow_nan=False), 200
+@main_blueprint.route('/gait_sample/upload/<patient_id>/<gait_sample_index>/', methods=["POST", "GET"])
+def gait_sample_upload(patient_id, gait_sample_index):
+    gait_sample_index = int(gait_sample_index)
+    db = get_db()
+    patient = db.patients.find_one({'_id': ObjectId(patient_id)})
+    if not patient:
+        return jsonify({'error': 'Patient not found. Oid: %s' % patient_id}), 404 
+    if  'gait_samples' not in patient.keys() or gait_sample_index >= len(patient['gait_samples'] ):
+        return jsonify({'error': 'Gait sample index %s for  Oid %s not found.' % (patient_id, str(gait_sample_index))}), 404 
+    qtm_matlab_file = request.files['file']
+    import oga_api.etl.qtm as qtm
+    data = qtm.readQTMFile(qtm_matlab_file.stream)
+    positional_data = {}
+    positional_data['patient_id'] = ObjectId(patient_id)
+    positional_data['gait_sample_index'] = gait_sample_index
+    positional_data['frame_rate'] = data['frame_rate']
+    positional_data['frames'] = data['frames']
+    positional_data['number_markers'] = data['number_markers']
+    positional_data['original_filename'] = qtm_matlab_file.filename
+    markers = [];
+    for i in range(data['number_markers']):
+            markers.append('')
+    positional_data['markers'] = markers
+    positional_data['trajectories'] = data['trajectories'].tolist()
+    pos_id = db.positionals_data.insert_one(positional_data).inserted_id
+    pos = db.positionals_data.find_one({'_id': ObjectId(pos_id)})
+    del pos['trajectories']
+    return json_util.dumps(pos, allow_nan=False), 200
 
+@main_blueprint.route('/gait_sample/positional_data/<id_pos>/', methods=["GET"])
+def get_positional_data(id_pos):
+    db = get_db()
+    pos = db.positionals_data.find_one({'_id': ObjectId(id_pos)})
+    if pos:
+        if 'trajectories' in pos.keys():
+            del pos['trajectories']
+        return json_util.dumps(pos), 200
+    else:
+        return jsonify({'error': 'not found'}), 404 
+
+@main_blueprint.route('/gait_sample/positionals_data/', methods=['PUT'])
+def add_positional_data():
+    db = get_db()
+    pos = json_util.loads(request.data)
+    positional = db.positionals_data.find_one({'_id': pos['_id']})
+    if not positional:
+        return jsonify({'error': 'not found'}), 404
+    db.positionals_data.replace_one({'_id': pos['_id']}, pos)
+    return json_util.dumps({"return": "Saved"}), 200
+ 
 @main_blueprint.route('/concept/graph')
 def get_graph():
     import matplotlib.pyplot as plt, mpld3
@@ -72,12 +109,10 @@ def plot_marker(id, sample_index, marker_index):
         return jsonify({'error': 'Patient not found. Oid:' + id}), 404 
     if  'gait_samples' not in patient.keys() or sample_index >= len(patient['gait_samples'] ):
         return jsonify({'error': 'Gait sample index ' + str(sample_index) + ' for  Oid:' + id + ' not found.'}), 404 
-  
     gait_sample = patient['gait_samples'][sample_index]
     x =  gait_sample['data']['trajectories'][marker_index][0]
     y =  gait_sample['data']['trajectories'][marker_index][1]
     z =  gait_sample['data']['trajectories'][marker_index][2]
- 
     import matplotlib.pyplot as plt, mpld3
     fig = plt.figure()
     plt.plot(x, 'r')
@@ -85,5 +120,3 @@ def plot_marker(id, sample_index, marker_index):
     plt.plot(z, 'g')
     html_str = mpld3.fig_to_html(fig)
     return html_str, 200
-
-

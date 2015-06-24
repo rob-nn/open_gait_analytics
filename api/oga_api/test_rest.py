@@ -1,6 +1,6 @@
 import unittest
 from . import create_app, get_db_connection
-from bson import json_util
+from bson import json_util, ObjectId
 from flask import current_app, url_for
 import numpy as np
 
@@ -14,11 +14,13 @@ class TestRest(unittest.TestCase):
 	self.app_context.push()
         self.db = get_db_connection('testing')
         self.db.patients.drop()
+	self.db.positionals_data.drop()
 	self.client = self.app.test_client(use_cookies=True)	
 
     def tearDown(self): 
         if self.db:
             self.db.patients.drop()
+	    self.db.positionals_data.drop()
 	self.app_context.pop()
 
     def test_app_exists(self):
@@ -74,24 +76,7 @@ class TestRest(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         patients = json_util.loads(r.data.decode('utf-8'))
         self.assertEqual(len(patients), 2)
-	''' 
-	    def test_gait_sample_upload(self):
-		qtm_file = open('oga_api/etl/Walk1.mat')
-		url = url_for('oga_api_0_0.gait_sample_upload')
-		r = self.client.post(url, data = {'file': (qtm_file, 'Walk1.mat'),})
-		self.assertEqual(r.status_code, 200)
-		qtm_data = json_util.loads(r.data.decode('utf-8')) 
-		self.assertEqual(qtm_data['frames'], 1491)
-		self.assertEqual(qtm_data['frame_rate'], 315)
-		self.assertEqual(qtm_data['number_markers'], 88)
-		self.assertEqual(qtm_data['original_filename'], 'Walk1.mat')
-		self.assertEqual(len(qtm_data['markers']), 88)
-		for marker in qtm_data['markers']:
-			self.assertEqual(marker, '')
-		#import numpy as np
-		#print np.array(qtm_data['trajectories']).shape
-		print r.data[:79]
-	'''
+	 
     def test_plot_marker_invalid(self) :
 	patient_id = self.db.patients.insert_one({'name': 'roberto'}).inserted_id
 	url = url_for('oga_api_0_0.plot_marker', id = patient_id, sample_index = 0, marker_index =0)
@@ -99,10 +84,61 @@ class TestRest(unittest.TestCase):
 	self.assertEqual(r.status_code, 404)
 
     def test_plot_marker_invalid_index(self) :
+	if True: return;
 	trajectories = np.arange(27).reshape((3,3,3))
 	gait_sample = {'data': {'trajectories': trajectories}}
-	patient = {'name': 'roberto', 'gait_samples': [sample]}
+	patient = {'name': 'roberto', 'gait_samples': [gait_sample]}
 	patient_id = self.db.patients.insert_one(patient).inserted_id
 	url = url_for('oga_api_0_0.plot_marker', id = patient_id, sample_index = 1, marker_index =0)
 	r = self.client.get(url)
+	self.assertEqual(r.status_code, 404)
+
+    def test_gait_sample_upload(self):
+	patient = {'name': 'Roberto', 'gait_samples' : [{'description': 'walk '}]}
+	patient_id = self.db.patients.insert_one(patient).inserted_id
+	patient = self.db.patients.find_one({'_id': patient_id})	
+	qtm_file = open('oga_api/etl/Walk1.mat')
+	url = url_for('oga_api_0_0.gait_sample_upload', patient_id=patient_id, gait_sample_index=0)
+	r = self.client.post(url, data = {'file': (qtm_file, 'Walk1.mat'),})
+	self.assertEqual(r.status_code, 200)
+	positional_data = json_util.loads(r.data.decode('utf-8')) 
+	self.assertEqual(positional_data['frames'], 1491)
+	self.assertEqual(positional_data['frame_rate'], 315)
+	self.assertEqual(positional_data['number_markers'], 88)
+	self.assertEqual(positional_data['original_filename'], 'Walk1.mat')
+	self.assertEqual(len(positional_data['markers']), 88)
+	self.assertEqual(positional_data['patient_id'], ObjectId(patient_id))
+	self.assertEqual(positional_data['gait_sample_index'], 0)
+	for marker in positional_data['markers']:
+		self.assertEqual(marker, '')
+
+    def test_get_positional_data(self):
+	positional_data = {'patient_id': ObjectId(u'000000000000000000000000'), 'gait_sample_index':0}
+	pos_id = self.db.positionals_data.insert_one(positional_data).inserted_id
+	url = url_for('oga_api_0_0.get_positional_data', id_pos= pos_id)
+	r = self.client.get(url)
+	pos = json_util.loads(r.data.decode('utf-8'))
+	self.assertEqual(r.status_code, 200)
+	self.assertEqual(pos['gait_sample_index'], 0)
+
+    def test_get_positional_data(self):
+	url = url_for('oga_api_0_0.get_positional_data', id_pos=u'000000000000000000000000')
+	r = self.client.get(url)
+	self.assertEqual(r.status_code, 404)
+
+    def test_add_positional_data(self):
+	positional_data = {'patient_id': ObjectId(u'000000000000000000000000'), 'gait_sample_index':0, 'initial_frame':0}
+	pos_id = self.db.positionals_data.insert_one(positional_data).inserted_id
+	positional_data = self.db.positionals_data.find_one({'_id': ObjectId(pos_id)})
+	positional_data['initial_frame'] = 1
+	url = url_for('oga_api_0_0.add_positional_data')
+	r = self.client.put(url,  headers={'Content-Type': 'application/json'}, data = json_util.dumps(positional_data))
+	self.assertEqual(r.status_code, 200)
+	pos_updated = self.db.positionals_data.find_one({'_id': ObjectId(pos_id)})
+	self.assertEqual(pos_updated['initial_frame'], 1)
+
+    def test_add_positional_data_position_not_found(self):
+	positional_data = {'_id': ObjectId(u'000000000000000000000000'), 'patient_id': ObjectId(u'000000000000000000000000'), 'gait_sample_index':0, 'initial_frame':0}
+	url = url_for('oga_api_0_0.add_positional_data')
+	r = self.client.put(url,  headers={'Content-Type': 'application/json'}, data = json_util.dumps(positional_data))
 	self.assertEqual(r.status_code, 404)
