@@ -29,6 +29,7 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.gait_sample).toBeDefined();
 		expect($scope.patient.gait_samples).toBeDefined();
 		expect($scope.isShowMarkers).toBe(false);
+		expect($scope.positionals_data).toBe(null);
 	};
 
 	it('Test initial state without gait samples', function () {
@@ -51,6 +52,7 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.gait_sample.patient).toEqual($scope.patient.id);
 		expect($scope.patient.gait_samples).toBeDefined();
 		expect($scope.isShowMarkers).toEqual(false);
+		expect($scope.positionalsData).toEqual(null);
 	});
 	it('Test add gait sample state after edit markers', function(){
 		$scope.addGaitData();
@@ -67,6 +69,9 @@ describe('Gait Analysis controller specification', function () {
 			expect(d.gait_samples.length).toEqual(1);
 			return [204, angular.fromJson(data), {}];
 		});
+		$httpBackend.whenGET(webapi + 'gait_sample/positional_data/0/0/').respond(function(){
+			return [404, {}, {}];
+		});
 		$scope.addGaitData();
 		delete $scope.patient.gait_samples;
 		expect($scope.patient.gait_samples).toBeUndefined();
@@ -75,9 +80,35 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.patient.gait_samples).toBeDefined();
 		expect($scope.patient.gait_samples.length).toEqual(1);
 		expect($location.path()).toBe('/gait_analysis/patient/' + $scope.patient._id.$oid + '/');
+		expect($scope.isAdding).toBe(false);
 	});
 
-	it('Test gait sample is undefined and thera gait samples', function(){
+	it('Test save a gait sample.', function(){
+		$httpBackend.whenPUT(webapi + 'patients/').respond(function(method, url, data, headers){
+			var d = JSON.parse(data);
+			expect(d.gait_samples).toBeDefined();
+			expect(d.gait_samples.length).toEqual(1);
+			return [204, angular.fromJson(data), {}];
+		});
+		$httpBackend.whenPUT(webapi + 'gait_sample/positionals_data/').respond(function(method, url, data, headers){
+			return [200, {}, {}];
+		});
+		$httpBackend.whenGET(webapi + 'gait_sample/positional_data/0/0/').respond(function(){
+			return [200, {_id:11}, {}];
+		});
+		expect($scope.isAdding).toBe(false);
+		$scope.showGaitSample(gait_sample);
+		$httpBackend.flush();   
+		expect($scope.positionals_data).toBeDefined();
+		$scope.saveSample();
+		$httpBackend.flush();   
+		expect($scope.positionals_data).toBeDefined();
+		expect($scope.positionals_data._id).toBeDefined();
+		expect($scope.positionals_data._id).toBe(11);
+	});
+
+
+	it('Test gait sample is undefined and there are gait samples', function(){
 		expect($scope.gait_sample).toBeDefined(); 
 	});
 
@@ -90,36 +121,26 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.patient.gait_samples.length).toBe(1);
 	});
 
-	it('Test save a gait sample.', function(){
-		$httpBackend.whenPUT(webapi + 'gait_samples/0/').respond(function(method, url, data, headers){
-			$scope.patient.samples[0].description = 'new description';
-			return [204, angular.fromJson(data), {}];
-		});
-		$scope.showGaitSample(gait_sample);
-		$scope.saveSample();
-		//$httpBackend.flush();   
-		//expect($scope.patient.samples[0].description).toEqual('new description');
-	});
-
 	it ('Test upload a gait sample', function() {
 		var files = [new File([''], 'mocks.txt')];
-		var mock_data = {'frame_rate': 315, 'frames': 2000, 'number_marks': 20, 'original_filename': 'mocks.txt'};
-		$httpBackend.whenPOST(webapi + 'gait_sample/upload/').respond(function(method, url, data, headers) {
+		var mock_data = {'id_patient': 0, 'gait_sample_index': 0, 'frame_rate': 315, 'frames': 2000, 'number_marks': 20, 'original_filename': 'mocks.txt'};
+		$httpBackend.whenPOST(webapi + 'gait_sample/upload/0/0/').respond(function(method, url, data, headers) {
 			expect(data).toBeDefined();
 			return [200, mock_data, {}];
 		});
+		$httpBackend.whenGET(webapi + 'gait_sample/positional_data/0/0/').respond(function(){
+			return [200, {_id:11}, {}];
+		});
 		$scope.upload(files);
 		$httpBackend.flush();
-		expect($scope.gait_sample.data).toBeDefined();
-		expect($scope.gait_sample.data).toEqual(mock_data);
+		expect($scope.gait_sample).toBeDefined();
+		expect($scope.positionals_data).toNotBe(null);
+		expect($scope.positionals_data.original_filename).toBe('mocks.txt');
 	});
 
 	it('Test showmarkers', function () {
 		$scope.showMarkers()
 		expect($scope.isShowMarkers).toBe(true);
-	});
-
-	it('Test show gait sample', function(){
 	});
 
 });

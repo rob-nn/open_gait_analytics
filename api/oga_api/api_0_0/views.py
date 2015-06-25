@@ -63,15 +63,16 @@ def gait_sample_upload(patient_id, gait_sample_index):
             markers.append('')
     positional_data['markers'] = markers
     positional_data['trajectories'] = data['trajectories'].tolist()
-    pos_id = db.positionals_data.insert_one(positional_data).inserted_id
-    pos = db.positionals_data.find_one({'_id': ObjectId(pos_id)})
+    db.positionals_data.replace_one({'patient_id': ObjectId(patient_id), 'gait_sample_index': gait_sample_index}, positional_data, True)
+    pos = db.positionals_data.find_one({'patient_id': ObjectId(patient_id), 'gait_sample_index': gait_sample_index})
     del pos['trajectories']
     return json_util.dumps(pos, allow_nan=False), 200
 
-@main_blueprint.route('/gait_sample/positional_data/<id_pos>/', methods=["GET"])
-def get_positional_data(id_pos):
+@main_blueprint.route('/gait_sample/positional_data/<id_patient>/<gait_sample_index>/', methods=["GET"])
+def get_positional_data(id_patient, gait_sample_index):
+    gait_sample_index = int( gait_sample_index)
     db = get_db()
-    pos = db.positionals_data.find_one({'_id': ObjectId(id_pos)})
+    pos = db.positionals_data.find_one({'patient_id': ObjectId(id_patient), 'gait_sample_index': gait_sample_index})
     if pos:
         if 'trajectories' in pos.keys():
             del pos['trajectories']
@@ -80,12 +81,13 @@ def get_positional_data(id_pos):
         return jsonify({'error': 'not found'}), 404 
 
 @main_blueprint.route('/gait_sample/positionals_data/', methods=['PUT'])
-def add_positional_data():
+def update_positional_data():
     db = get_db()
     pos = json_util.loads(request.data)
     positional = db.positionals_data.find_one({'_id': pos['_id']})
     if not positional:
         return jsonify({'error': 'not found'}), 404
+    pos['trajectories'] = positional['trajectories']
     db.positionals_data.replace_one({'_id': pos['_id']}, pos)
     return json_util.dumps({"return": "Saved"}), 200
  

@@ -72,3 +72,41 @@ describe ('Patients Facade specification.',function(){
 		$httpBackend.flush();
 	});
 });
+
+describe('PositionalsData especification tests', function(){
+	var positionalsDataFacade, $httpBackend, webapi;
+	beforeEach(module('oga_web.oga_facade'));
+	beforeEach(inject(function(_positionalsDataFacade_, _$httpBackend_, urlApi){
+		positionalsDataFacade = _positionalsDataFacade_;
+		$httpBackend = _$httpBackend_;
+		webapi = urlApi.urlString(); 
+	}));
+
+	it ('Must get a positional data', function(){
+		$httpBackend.whenGET(webapi + 'gait_sample/positional_data/0/0/').respond(function(){
+			var pos = {'_id':0} 
+			return [200, pos, {}];
+		});
+		positionalsDataFacade.getPositionalsData(0, 0).success(function(data, status){
+			expect(status).toEqual(200);
+			expect(data).toBeDefined();
+			expect(data._id).toEqual(0);
+		});
+		$httpBackend.flush();
+	});
+
+	it('Must update positionals data', function (){
+		$httpBackend.whenPUT(webapi + 'gait_sample/positionals_data/').respond(function(method, url, data) {
+			data = angular.fromJson(data)
+			expect(data._id).toBeDefined();
+			expect(data._id).toBe(0);
+			return [200, {}, {}]
+		});
+		var pos = {'_id': 0}
+		positionalsDataFacade.updatePositionalsData(pos).success(function(data, status){
+			expect(status).toEqual(200)
+		});
+		$httpBackend.flush()
+	});
+});
+

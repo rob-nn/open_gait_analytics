@@ -34,4 +34,19 @@ angular.module('oga_web.oga_facade', [])
 		showGraph: _showGraph , 
 		plotMarker: _plotMarker
 	};
+})
+.factory('positionalsDataFacade', function($http, urlApi){
+	var _getPositionalsData = function (idPatient, gaitSampleIndex) {
+		return $http.get(urlApi.urlString() + 'gait_sample/positional_data/' + idPatient + '/' + gaitSampleIndex + '/');
+	};
+
+	var _updatePositionalsData = function (positionalsData) {
+		return $http.put(urlApi.urlString() + 'gait_sample/positionals_data/', positionalsData);
+	};
+
+	return {
+		getPositionalsData : _getPositionalsData, 
+		updatePositionalsData : _updatePositionalsData
+	};
 });
+

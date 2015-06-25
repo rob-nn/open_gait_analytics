@@ -32,7 +32,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.isAdding = false;
 	$scope.gaitSampleEnabled = false;
 	$scope.gait_sample = null;
-	$scope.positionals_data = null;
 	$scope.isShowMarkers = false;
 
 	$scope.showGraphic = showGraphic;
@@ -43,6 +42,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.cancel = cancel;
 	$scope.saveSample= saveSample;
 	$scope.showMarkers = showMarkers;
+	$scope.positionals_data = null;
 
 	if ($scope.gait_sample == null){
 		if ($scope.patient.gait_samples && $scope.patient.gait_samples.length > 0){
@@ -68,10 +68,8 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		$scope.gaitSampleEnabled = true;
 		$scope.isAdding = false;
 		var sample_index = $scope.patient.gait_samples.indexOf($scope.gait_sample);
-		positionalsDataFacade.getPositionalsData($scope.patient._id.$oid, sample_index).success(function(data, status, headers, config){
+		positionalsDataFacade.getPositionalData($scope.patient._id.$oid, sample_index).success(function(data, status, headers, config){
 			$scope.positionals_data = data;			
-		}).error(function(data, status, headers, config){
-			$scope.positionals_data = null;
 		});
 	}
 
@@ -93,10 +91,8 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			});
 		}
 	};
-
 	function addGaitData() {
 		$scope.gait_sample = {date:new Date(), description:null};
-		$scope.positionals_data = null;
 		$scope.isAdding = true;
 		$scope.gaitSampleEnabled = false;
 		$scope.isShowMarkers = false;
@@ -114,10 +110,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			$scope.patient.gait_samples.push($scope.gait_sample);
 		}
 		patientsFacade.updatePatient($scope.patient).success(function (data, status, headers, config) {
-			if (!$scope.isAdding) 
-				positionalsDataFacade.updatePositionalsData($scope.positionals_data).success(function(data, status, headers, config){});
-			else
-				$scope.isAdding = false;
+			$scope.isAdding = false;
 			$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid  + '/');
 		})
 		.error(function(data, status, headers, config){
