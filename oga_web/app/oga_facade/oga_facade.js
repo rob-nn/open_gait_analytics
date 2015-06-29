@@ -22,17 +22,12 @@ angular.module('oga_web.oga_facade', [])
 		return $http.get(urlApi.urlString() + 'concept/graph');
 	}
 
-	var _plotMarker = function (id, sample, marker) {
-		return $http.get(urlApi.urlString() + 'gait_sample/' + id + '/' + sample + '/' + marker + '/')
-	}
-
 	return {
 		getPatients: _getPatients,
 		getPatient: _getPatient,
 		addPatient: _addPatient,
 		updatePatient: _updatePatient,
-		showGraph: _showGraph , 
-		plotMarker: _plotMarker
+		showGraph: _showGraph 
 	};
 })
 .factory('positionalsDataFacade', function($http, urlApi){
@@ -44,9 +39,15 @@ angular.module('oga_web.oga_facade', [])
 		return $http.put(urlApi.urlString() + 'gait_sample/positionals_data/', positionalsData);
 	};
 
+	var _plotMarker = function (idPositionalsMarkers,  marker) {
+		return $http.get(urlApi.urlString() + 'gait_sample/' + idPositionalsMarkers + '/' + marker + '/');
+	}
+
+
 	return {
 		getPositionalsData : _getPositionalsData, 
-		updatePositionalsData : _updatePositionalsData
+		updatePositionalsData : _updatePositionalsData, 
+		plotMarker: _plotMarker
 	};
 });
 

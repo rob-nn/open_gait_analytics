@@ -78,8 +78,7 @@ class TestRest(unittest.TestCase):
         self.assertEqual(len(patients), 2)
 	 
     def test_plot_marker_invalid(self) :
-	patient_id = self.db.patients.insert_one({'name': 'roberto'}).inserted_id
-	url = url_for('oga_api_0_0.plot_marker', id = patient_id, sample_index = 0, marker_index =0)
+	url = url_for('oga_api_0_0.plot_marker', id_positionals_data = u'000000000000000000000000', marker_index = 0)
 	r = self.client.get(url)
 	self.assertEqual(r.status_code, 404)
 
@@ -92,6 +91,17 @@ class TestRest(unittest.TestCase):
 	url = url_for('oga_api_0_0.plot_marker', id = patient_id, sample_index = 1, marker_index =0)
 	r = self.client.get(url)
 	self.assertEqual(r.status_code, 404)
+
+    def test_plot_marker(self):
+	patient = {'name': 'Roberto', 'gait_samples' : [{'description': 'walk'}]}
+	patient_id = self.db.patients.insert_one(patient).inserted_id
+	patient = self.db.patients.find_one({'_id': patient_id})
+	qtm_file = open('oga_api/etl/Walk5.mat')
+	url = url_for('oga_api_0_0.gait_sample_upload', patient_id=patient_id, gait_sample_index=0)
+	r = self.client.post(url, data = {'file': (qtm_file, 'Walk5.mat'),})
+	self.assertEqual(r.status_code, 200)
+	pos = self.db.positionals_data.find_one({'patient_id': patient_id, 'gait_sample_index': 0})
+	url = url_for('oga_api_0_0.plot_marker', id_positionals_data = pos['_id'], sample_index = 1, marker_index =0)
 
     def test_gait_sample_upload_add(self):
 	patient = {'name': 'Roberto', 'gait_samples' : [{'description': 'walk '}]}
@@ -183,18 +193,13 @@ class TestRest(unittest.TestCase):
         positional_data = {'patient_id': ObjectId(u'000000000000000000000000'), 'gait_sample_index':0, 'initial_frame':0, 'trajectories': trajectories}
 	pos_id = self.db.positionals_data.insert_one(positional_data).inserted_id
         del positional_data['trajectories']
-        positional_data['initial_frame'] = 5 
+        positional_data['initial_frame'] = 5
 	url = url_for('oga_api_0_0.update_positional_data')
 	r = self.client.put(url,  headers={'Content-Type': 'application/json'}, data = json_util.dumps(positional_data))
 	self.assertEqual(r.status_code, 200)
 	pos_updated = self.db.positionals_data.find_one({'_id': ObjectId(pos_id)})
         self.assertEqual(pos_updated['initial_frame'], 5)
 	self.assertEqual(pos_updated['trajectories'][0], trajectories[0])
-
-
-	
-
-
 
     def test_update_positional_data_position_not_found(self):
 	positional_data = {'_id': ObjectId(u'000000000000000000000000'), 'patient_id': ObjectId(u'000000000000000000000000'), 'gait_sample_index':0, 'initial_frame':0}

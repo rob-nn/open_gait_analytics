@@ -29,7 +29,7 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.gait_sample).toBeDefined();
 		expect($scope.patient.gait_samples).toBeDefined();
 		expect($scope.isShowMarkers).toBe(false);
-		expect($scope.positionals_data).toBe(null);
+		expect($scope.positionalsData).toBe(null);
 	};
 
 	it('Test initial state without gait samples', function () {
@@ -99,12 +99,12 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.isAdding).toBe(false);
 		$scope.showGaitSample(gait_sample);
 		$httpBackend.flush();   
-		expect($scope.positionals_data).toBeDefined();
+		expect($scope.positionalsData).toBeDefined();
 		$scope.saveSample();
 		$httpBackend.flush();   
-		expect($scope.positionals_data).toBeDefined();
-		expect($scope.positionals_data._id).toBeDefined();
-		expect($scope.positionals_data._id).toBe(11);
+		expect($scope.positionalsData).toBeDefined();
+		expect($scope.positionalsData._id).toBeDefined();
+		expect($scope.positionalsData._id).toBe(11);
 	});
 
 
@@ -134,8 +134,8 @@ describe('Gait Analysis controller specification', function () {
 		$scope.upload(files);
 		$httpBackend.flush();
 		expect($scope.gait_sample).toBeDefined();
-		expect($scope.positionals_data).toNotBe(null);
-		expect($scope.positionals_data.original_filename).toBe('mocks.txt');
+		expect($scope.positionalsData).toNotBe(null);
+		expect($scope.positionalsData.original_filename).toBe('mocks.txt');
 	});
 
 	it('Test showmarkers', function () {

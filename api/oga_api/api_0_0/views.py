@@ -100,22 +100,24 @@ def get_graph():
     html_str = mpld3.fig_to_html(fig)
     return html_str
 
-@main_blueprint.route('/gait_sample/<id>/<sample_index>/<marker_index>/', methods=['GET'])
-def plot_marker(id, sample_index, marker_index):
-    #import pdb; pdb.set_trace()
-    sample_index = int(sample_index)
+@main_blueprint.route('/gait_sample/<id_positionals_data>/<marker_index>/', methods=['GET'])
+def plot_marker(id_positionals_data, marker_index):
+    id_positionals_data = id_positionals_data
     marker_index = int(marker_index)
     db = get_db()
-    patient = db.patients.find_one({'_id': ObjectId(id)})
-    if not patient:
-        return jsonify({'error': 'Patient not found. Oid:' + id}), 404 
-    if  'gait_samples' not in patient.keys() or sample_index >= len(patient['gait_samples'] ):
-        return jsonify({'error': 'Gait sample index ' + str(sample_index) + ' for  Oid:' + id + ' not found.'}), 404 
-    gait_sample = patient['gait_samples'][sample_index]
-    x =  gait_sample['data']['trajectories'][marker_index][0]
-    y =  gait_sample['data']['trajectories'][marker_index][1]
-    z =  gait_sample['data']['trajectories'][marker_index][2]
+
+    pos = db.positionals_data.find_one({'_id': ObjectId(id_positionals_data)})
+    if not pos:
+        return jsonify({'error': 'Positionals data not found. Oid:' + id_positionals_data}), 404 
+    if marker_index >= pos['number_markers']:
+        return jsonify({'error' : 'Marker index invalid'}), 404 
+
+    x =  pos['trajectories'][marker_index][0]
+    y =  pos['trajectories'][marker_index][1]
+    z =  pos['trajectories'][marker_index][2]
+
     import matplotlib.pyplot as plt, mpld3
+
     fig = plt.figure()
     plt.plot(x, 'r')
     plt.plot(y, 'b')

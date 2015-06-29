@@ -45,7 +45,6 @@ describe ('Patients Facade specification.',function(){
 			expect(status).toEqual(201);
 		});
 		$httpBackend.flush();
-
 	});
 
 	it('Must update a patient', function (){
@@ -58,16 +57,6 @@ describe ('Patients Facade specification.',function(){
 
 		patientsFacade.updatePatient(patient).success(function(data, status){
 			expect(status).toEqual(200);	
-		});
-		$httpBackend.flush();
-	});
-	it('Must plot marker', function (){
-		$httpBackend.whenGET(webapi + 'gait_sample/1/2/3/').respond(function(method, url, data){
-			return [200, {}, {}]
-		});
-
-		patientsFacade.plotMarker(1, 2, 3).success(function(data, status) {
-			expect(status).toEqual(200);
 		});
 		$httpBackend.flush();
 	});
@@ -108,5 +97,16 @@ describe('PositionalsData especification tests', function(){
 		});
 		$httpBackend.flush()
 	});
+
+	it('Must plot marker', function (){
+		$httpBackend.whenGET(webapi + 'gait_sample/1/2/').respond(function(method, url, data){
+			return [200, {}, {}]
+		});
+		positionalsDataFacade.plotMarker(1, 2).success(function(data, status) {
+			expect(status).toEqual(200);
+		});
+		$httpBackend.flush();
+	});
+
 });
 

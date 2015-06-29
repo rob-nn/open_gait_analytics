@@ -2,10 +2,10 @@
 	<h3>Markers Names</h3>
 	<form name='markersForm'>
 			<div ng-bind-html= "graphResponse"></div>
-		<md-content flex layout='row' ng-repeat='marker in gait_sample.data.markers track by $index'>
+		<md-content flex layout='row' ng-repeat='marker in positionalsData.markers track by $index'>
 			<md-input-container>
 				<label>Marker {{$index}}</label>
-				<input ng-model='gait_sample.data.markers[$index]'></input>
+				<input ng-model='positionalsData.markers[$index]'></input>
 			</md-input-container>
 			<md-button aria-label='View graphic' ng-click='showGraphic($index)'> 
 				<md-tooltip>View graphic</md-tooltip>
