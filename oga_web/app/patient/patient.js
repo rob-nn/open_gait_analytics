@@ -1,5 +1,5 @@
 'use strict';
-angular.module('oga_web.patient', ["ngRoute", "ngMaterial", "ngMdIcons", "oga_web.oga_facade"])
+angular.module('oga_web.patient', ["ngMessages", "ngRoute", "ngMaterial", "ngMdIcons", "oga_web.oga_facade"])
 .config(['$routeProvider', function($routeProvider) {
 	$routeProvider.when("/patient_new", {
 		templateUrl: "patient/patient.html",

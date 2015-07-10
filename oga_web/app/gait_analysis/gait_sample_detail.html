@@ -1,14 +1,21 @@
 <div flex layout='column'>
 	<form name='gaitSampleForm'>
+		<h1>QTM Gait Sample</h1>
 		<md-content flex layout='row'>
 			<md-input-container>
 				<label>Description</label>
-				<input ng-model='gait_sample.description' ng-required='true'></input>
+				<input name="description" ng-model='gait_sample.description' ng-required='true'></input>
+				<ng-messages for="gaitSampleForm.description.$error" multiple>
+					<div ng-messages-include="error_messages.html"></div>
+				</ng-messages>
 			</md-input-container>
 			<md-input-container>
 				<label>Date</label>
 				<input name='date' type="date"  ng-model="gait_sample.date" 
-					ng-required='false'/>
+					ng-required='true'/>
+				<ng-messages for="gaitSampleForm.date.$error" multiple>
+					<div ng-messages-include="error_messages.html"></div>
+				</ng-messages>
 			</md-input-container>
 			<md-button aria-label='Save sample' ng-click='saveSample()' ng-disabled='gaitSampleForm.$invalid'>
 				<md-tooltip>Save sample</md-tooltip>

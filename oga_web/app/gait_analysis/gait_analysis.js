@@ -62,6 +62,10 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	}
 
 	function showGaitSample(gait_sample) {
+		if (gait_sample.date) {
+			var date = new Date(gait_sample.date);
+			gait_sample.date = date;
+		}
 		$scope.gait_sample = gait_sample;
 		$scope.gaitSampleEnabled = true;
 		$scope.isAdding = false;
@@ -93,7 +97,9 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	};
 
 	function addGaitData() {
-		$scope.gait_sample = {date:new Date(), description:null};
+		var newDate = new Date();
+		newDate =new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
+		$scope.gait_sample = {date:newDate, description:null};
 		$scope.positionalsData = null;
 		$scope.isAdding = true;
 		$scope.gaitSampleEnabled = false;
@@ -149,5 +155,4 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			//$log.debug("close LEFT is done");
 		});
 	};
-	
 });
