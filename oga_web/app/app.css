@@ -31,7 +31,7 @@
 
 
 .oga-float-bottom-right {
-	position: absolute 	!important;
+	position: fixed !important;
 	right:    0;
 	bottom:   0;
 }

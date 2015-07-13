@@ -1,64 +1,65 @@
 <div flex layout='column'>
-	<form name='gaitSampleForm'>
-		<h1>QTM Gait Sample</h1>
-		<md-content flex layout='row'>
+	<h1>QTM Gait Sample</h1>
+	<md-content flex layout='row'>
+		<md-input-container>
+			<label>Description</label>
+			<input name="description" ng-model='gait_sample.description' ng-required='true'></input>
+			<ng-messages for="gaitSampleForm.description.$error" multiple>
+				<div ng-messages-include="error_messages.html"></div>
+			</ng-messages>
+		</md-input-container>
+		<md-input-container>
+			<label>Date</label>
+			<input name='date' type="date"  ng-model="gait_sample.date" 
+				ng-required='true'/>
+			<ng-messages for="gaitSampleForm.date.$error" multiple>
+				<div ng-messages-include="error_messages.html"></div>
+			</ng-messages>
+		</md-input-container>
+	</md-content>
+	<div ng-hide='isAdding'>
+		<h3>QTM Data File (MATLAB Format)</h3>
+		<md-input-container ng-hide='positionalsData'>
+			<input ng-required='true' type='file' ngf-select='' ngf-change="upload($files)"></input>
+		</md-input-container>
+		<md-content layout='row' ng-show='positionalsData'>
 			<md-input-container>
-				<label>Description</label>
-				<input name="description" ng-model='gait_sample.description' ng-required='true'></input>
-				<ng-messages for="gaitSampleForm.description.$error" multiple>
+				<label>Initial Frame</label>
+				<input name="initial_frame" ng-model='positionalsData.initial_frame' type='number' min='0'/>
+				<ng-messages for="gaitSampleForm.initial_frame.$error" multiple>
+					<div ng-messages-include="error_messages.html"></div>
+				</ng-messages>
+
+			</md-input-container>
+			<md-input-container>
+				<label>Final Frame</label>
+				<input name="final_frame" ng-model='positionalsData.final_frame' type='number' min='0'/>
+				<ng-messages for="gaitSampleForm.final_frame.$error" multiple>
 					<div ng-messages-include="error_messages.html"></div>
 				</ng-messages>
 			</md-input-container>
+		</md-content>
+		<md-content flex layout="row" ng-show='positionalsData'>
 			<md-input-container>
-				<label>Date</label>
-				<input name='date' type="date"  ng-model="gait_sample.date" 
-					ng-required='true'/>
-				<ng-messages for="gaitSampleForm.date.$error" multiple>
-					<div ng-messages-include="error_messages.html"></div>
-				</ng-messages>
+				<label>Filename</label>
+				<input ng-model='positionalsData.original_filename' ng-disabled="true"></input>
 			</md-input-container>
-			<md-button aria-label='Save sample' ng-click='saveSample()' ng-disabled='gaitSampleForm.$invalid'>
-				<md-tooltip>Save sample</md-tooltip>
-				<ng-md-icon icon="save" size="72" postion="bl"></ng-md-icon>
+			<md-input-container>
+				<label>Frames</label>
+				<input ng-model='positionalsData.frames' ng-disabled="true"></input>
+			</md-input-container>
+			<md-input-container>
+				<label>Frame Rate</label>
+				<input ng-model='positionalsData.frame_rate' ng-disabled="true"></input>
+			</md-input-container>
+			<md-input-container>
+				<label>Markers</label>
+				<input ng-model='positionalsData.number_markers' ng-disabled="true"></input>
+			</md-input-container>
+			<md-button aria-label='Markers' ng-click='showMarkers()'>
+				<md-tooltip>Markers</md-tooltip>
+				<ng-md-icon icon="assignment" size="72" postion="br"></ng-md-icon>
 			</md-button>
 		</md-content>
-		<div ng-hide='isAdding'>
-			<h3>QTM Data File (MATLAB Format)</h3>
-			<md-input-container>
-				<input ng-required='true' type='file' ngf-select='' ngf-change="upload($files)"></input>
-			</md-input-container>
-			<md-content layout='row' ng-show='positionalsData'>
-				<md-input-container>
-					<label>Initial Frame</label>
-					<input ng-model='positionalsData.initial_frame' type='number' min='0'/>
-				</md-input-container>
-				<md-input-container>
-					<label>Final Frame</label>
-					<input ng-model='positionalsData.final_frame' type='number' min='0'/>
-				</md-input-container>
-			</md-content>
-			<md-content flex layout="row" ng-show='positionalsData'>
-				<md-input-container>
-					<label>Filename</label>
-					<input ng-model='positionalsData.original_filename' ng-disabled="true"></input>
-				</md-input-container>
-				<md-input-container>
-					<label>Frames</label>
-					<input ng-model='positionalsData.frames' ng-disabled="true"></input>
-				</md-input-container>
-				<md-input-container>
-					<label>Frame Rate</label>
-					<input ng-model='positionalsData.frame_rate' ng-disabled="true"></input>
-				</md-input-container>
-				<md-input-container>
-					<label>Markers</label>
-					<input ng-model='positionalsData.number_markers' ng-disabled="true"></input>
-				</md-input-container>
-				<md-button aria-label='Name markers' ng-click='showMarkers()'>
-					<md-tooltip>Name markers</md-tooltip>
-					<ng-md-icon icon="assignment" size="72" postion="br"></ng-md-icon>
-				</md-button>
-			</md-content>
-		</div>
-	</form>
+	</div>
 </div>

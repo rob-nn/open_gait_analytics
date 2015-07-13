@@ -42,6 +42,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.cancel = cancel;
 	$scope.saveSample= saveSample;
 	$scope.showMarkers = showMarkers;
+	$scope.goBack = goBack;
 
 	if ($scope.gait_sample == null){
 		if ($scope.patient.gait_samples && $scope.patient.gait_samples.length > 0){
@@ -111,6 +112,9 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	function cancel() {
 		$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid + '/');
 	}
+	function goBack() {
+		$location.path('/');
+	}
 	function saveSample(){
 		if ($scope.isAdding){
 				if (typeof($scope.patient.gait_samples) === 'undefined')
@@ -122,7 +126,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 				positionalsDataFacade.updatePositionalsData($scope.positionalsData).success(function(data, status, headers, config){});
 			else
 				$scope.isAdding = false;
-			$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid  + '/');
+			//$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid  + '/');
 		})
 		.error(function(data, status, headers, config){
 			$scope.patient.gait_samples.pop();
