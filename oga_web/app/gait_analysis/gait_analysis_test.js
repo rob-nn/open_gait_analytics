@@ -79,8 +79,8 @@ describe('Gait Analysis controller specification', function () {
 		$httpBackend.flush();
 		expect($scope.patient.gait_samples).toBeDefined();
 		expect($scope.patient.gait_samples.length).toEqual(1);
-		expect($location.path()).toBe('/gait_analysis/patient/' + $scope.patient._id.$oid + '/');
 		expect($scope.isAdding).toBe(false);
+		expect($scope.gaitSampleEnabled).toBe(true);
 	});
 
 	it('Test save a gait sample.', function(){
@@ -102,6 +102,8 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.positionalsData).toBeDefined();
 		$scope.saveSample();
 		$httpBackend.flush();   
+		expect($scope.isAdding).toBe(false);
+		expect($scope.gaitSampleEnabled).toBe(true);
 		expect($scope.positionalsData).toBeDefined();
 		expect($scope.positionalsData._id).toBeDefined();
 		expect($scope.positionalsData._id).toBe(11);
@@ -119,6 +121,7 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.gaitSampleEnabled).toEqual(true);
 		expect($scope.gait_sample).toEqual(gait_sample);
 		expect($scope.patient.gait_samples.length).toBe(1);
+		expect($scope.isShowMarkers).toBe(false);
 	});
 
 	it ('Test upload a gait sample', function() {

@@ -206,3 +206,19 @@ class TestRest(unittest.TestCase):
 	url = url_for('oga_api_0_0.update_positional_data')
 	r = self.client.put(url,  headers={'Content-Type': 'application/json'}, data = json_util.dumps(positional_data))
 	self.assertEqual(r.status_code, 404)
+
+
+    def test_delete_positional_data(self):
+        trajectories = [[0, 0, 0]]
+        positional_data = {'patient_id': ObjectId(u'000000000000000000000000'), 'gait_sample_index':0, 'initial_frame':0, 'trajectories': trajectories}
+	pos_id = self.db.positionals_data.insert_one(positional_data).inserted_id
+	url = url_for('oga_api_0_0.delete_positional_data', pos_id = pos_id)
+	r = self.client.delete(url,  headers={'Content-Type': 'application/json'})
+	self.assertEqual(r.status_code, 200)
+	pos_data = self.db.positionals_data.find_one({'_id': ObjectId(pos_id)})
+        self.assertEqual(pos_data, None)
+
+    def test_delete_unexistent_positional_data(self):
+	url = url_for('oga_api_0_0.delete_positional_data', pos_id = ObjectId(u'000000000000000000000000'))
+        r = self.client.delete(url)
+        self.assertEqual(r.status_code, 412)

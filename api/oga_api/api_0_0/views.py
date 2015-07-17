@@ -90,7 +90,17 @@ def update_positional_data():
     pos['trajectories'] = positional['trajectories']
     db.positionals_data.replace_one({'_id': pos['_id']}, pos)
     return json_util.dumps({"return": "Saved"}), 200
- 
+
+@main_blueprint.route('/gait_sample/positionals_data/<pos_id>/', methods=['DELETE'])
+def delete_positional_data(pos_id):
+    db = get_db()
+    result = db.positionals_data.delete_one({'_id': ObjectId(pos_id)})
+    if (result.deleted_count == 1):
+    	return "", 200
+    else:
+	return "", 412
+
+
 @main_blueprint.route('/concept/graph')
 def get_graph():
     import matplotlib.pyplot as plt, mpld3
@@ -124,3 +134,4 @@ def plot_marker(id_positionals_data, marker_index):
     plt.plot(z, 'g')
     html_str = mpld3.fig_to_html(fig)
     return html_str, 200
+

@@ -89,13 +89,23 @@ describe('PositionalsData especification tests', function(){
 			data = angular.fromJson(data)
 			expect(data._id).toBeDefined();
 			expect(data._id).toBe(0);
-			return [200, {}, {}]
+			return [200, {}, {}];
 		});
 		var pos = {'_id': 0}
 		positionalsDataFacade.updatePositionalsData(pos).success(function(data, status){
-			expect(status).toEqual(200)
+			expect(status).toEqual(200);
 		});
 		$httpBackend.flush()
+	});
+
+	it('Must delete positionals data', function(){
+		$httpBackend.whenDELETE(webapi + 'gait_sample/positionals_data/0/').respond(function(method, url, data){
+			return [200, {}, {}];
+		});	
+		positionalsDataFacade.deletePositionalsData(0).success(function(data, status){
+			expect(status).toEqual(200);
+		});
+		$httpBackend.flush();
 	});
 
 	it('Must plot marker', function (){

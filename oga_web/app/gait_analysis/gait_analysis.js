@@ -23,7 +23,9 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$timeout, 
 	$mdSidenav, 
 	$mdUtil, 
-	$log, 
+	$mdToast,
+	$log,
+        $mdDialog,	
 	urlApi,
 	patientsFacade,
 	positionalsDataFacade){
@@ -40,6 +42,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.addGaitData = addGaitData;
 	$scope.setFile = setFile;
 	$scope.cancel = cancel;
+	$scope.confirmDeletion = confirmDeletion;
 	$scope.saveSample= saveSample;
 	$scope.showMarkers = showMarkers;
 	$scope.goBack = goBack;
@@ -52,6 +55,28 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	else {
 		$scope.showGaitSample($scope.gait_sample);
 	}
+
+	function confirmDeletion(ev) {
+		// Appending dialog to document.body to cover sidenav in docs app
+		var confirm = $mdDialog.confirm()
+		.title('Would you like to delete gait sample ' + $scope.gait_sample.description + '?')
+		.content('')
+		.ariaLabel('Gait Sample Deletion')
+		.ok('Ok')
+		.cancel('Cancel')
+		.targetEvent(ev);
+		$mdDialog.show(confirm).then(function() {
+			positionalsDataFacade.deletePositionalsData($scope.positionalsData._id.$oid).success(function(data, status, headers, config) {	
+				$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid + '/');
+				make_toast('Deleted');
+			})
+			.error(function (data, status, headers, config){
+				make_toast('Deletion failed');
+			});
+		}, function() {
+			make_toast('Canceled');
+		});
+	};
 
 	function showGraphic (selected_marker) {
 		positionalsDataFacade.plotMarker($scope.positionalsData._id.$oid, selected_marker).success(function (data, status, headers, config) {
@@ -76,6 +101,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		}).error(function(data, status, headers, config){
 			$scope.positionalsData = null;
 		});
+		$scope.isShowMarkers = false;
 	}
 
 	function upload (files){
@@ -117,15 +143,27 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	}
 	function saveSample(){
 		if ($scope.isAdding){
-				if (typeof($scope.patient.gait_samples) === 'undefined')
+			if (typeof($scope.patient.gait_samples) === 'undefined')
 				$scope.patient.gait_samples = [];
 			$scope.patient.gait_samples.push($scope.gait_sample);
 		}
 		patientsFacade.updatePatient($scope.patient).success(function (data, status, headers, config) {
 			if (!$scope.isAdding) 
-				positionalsDataFacade.updatePositionalsData($scope.positionalsData).success(function(data, status, headers, config){});
-			else
+				positionalsDataFacade.updatePositionalsData($scope.positionalsData).success(function(data, status, headers, config){
+					var isShowMarkers = $scope.isShowMarkers;
+					$scope.showGaitSample($scope.gait_sample);
+					$scope.isShowMarkers = isShowMarkers;	
+					make_toast('Saved');
+				})
+				.error(function(data, status, headers, config){
+					make_toast('Failed');
+				});
+			
+			else{
 				$scope.isAdding = false;
+				$scope.showGaitSample($scope.gait_sample);
+				make_toast('Saved');
+			}
 			//$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid  + '/');
 		})
 		.error(function(data, status, headers, config){
@@ -158,5 +196,13 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		.then(function () {
 			//$log.debug("close LEFT is done");
 		});
+	};
+	function make_toast(str) {
+		$mdToast.show(
+			$mdToast.simple()
+			.content(str)
+			.position('bottom right')
+			.hideDelay(3000)
+		);
 	};
 });

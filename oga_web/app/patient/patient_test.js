@@ -4,9 +4,9 @@ describe('Patient controller specification.', function() {
 	var $scope, $httpBackend, $location, webapi
 	beforeEach(module('oga_web.patient'));
 	beforeEach(inject( function ($controller, $rootScope, _$location_, _$httpBackend_, urlApi){
+		$httpBackend = _$httpBackend_;
 		$scope = $rootScope.$new();
 		$controller('patientNewCtrl', {$scope:$scope});
-		$httpBackend = _$httpBackend_;
 		webapi = urlApi.urlString();
 		$location = _$location_
 	}));

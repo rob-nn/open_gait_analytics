@@ -6,18 +6,6 @@
 	<h1>{{apptitle}}</h1>
 	<span flex></span>
 </md-toolbar>
-<div layout="column">
-	<md-grid-list md-cols='4' md-row-height='256px' md-gutter=5>
-		<md-grid-tile ng-repeat='patient in patients' ng-click='openGaitAnalysis(patient._id.$oid)'>
-			<img ng-src="images/People-Patient-Male-icon.png"></img>
-			<md-grid-tile-footer><h3>{{patient.name}}</h3></md-grid-tile-footer>
-		</md-grid-tile>
-	</md-grid-list>
-	<md-button aria-label='Add Patient' class="oga-float-bottom-right" ng-click='createPatient()'>
-		<md-tooltip>Add Patient</md-tooltip>
-		<ng-md-icon icon="add_circle" size="72" postion="br"></ng-md-icon>
-	</md-button>
-</div>
 <section layout='row' style="height:100%;" flex>
 	<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" flex>
 		<h2>Gait Analysis</h2>
@@ -53,10 +41,16 @@
 			 <div layout="column">
 				<div flex ng-include src="'gait_analysis/gait_sample_detail.html'" ng-show='gaitSampleEnabled || isAdding'></div>
 				<div flex ng-include src="'gait_analysis/markers.html'" ng-show="isShowMarkers"></div>
-				<md-button class="oga-float-bottom-right" aria-label='Save sample' ng-click='saveSample()' ng-disabled='gaitSampleForm.$invalid'>
-					<md-tooltip>Save sample</md-tooltip>
-					<ng-md-icon icon="save" size="72" postion="bl"></ng-md-icon>
-				</md-button>
+				<div layout="row" class="oga-float-bottom-right" >
+					<md-button aria-label='Delete sample' ng-click='confirmDeletion($event)' ng-show='!isAdding'>
+						<md-tooltip>Delete sample</md-tooltip>
+						<ng-md-icon icon="delete" size="72" postion="bl"></ng-md-icon>
+					</md-button>
+					<md-button aria-label='Save sample' ng-click='saveSample()' ng-disabled='gaitSampleForm.$invalid'>
+						<md-tooltip>Save sample</md-tooltip>
+						<ng-md-icon icon="save" size="72" postion="bl"></ng-md-icon>
+					</md-button>
+				</div>
 			 </div>
 		</form>
 	</md-content>
