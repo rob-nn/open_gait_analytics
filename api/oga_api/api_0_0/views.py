@@ -129,9 +129,10 @@ def plot_marker(id_positionals_data, marker_index):
     import matplotlib.pyplot as plt, mpld3
 
     fig = plt.figure()
-    plt.plot(x, 'r')
-    plt.plot(y, 'b')
-    plt.plot(z, 'g')
+    curve_x, = plt.plot(x, 'r')
+    curve_y, = plt.plot(y, 'b')
+    curve_z, = plt.plot(z, 'g')
+    plt.legend([curve_x, curve_y, curve_z], ['x', 'y', 'z'])
     html_str = mpld3.fig_to_html(fig)
     return html_str, 200
 

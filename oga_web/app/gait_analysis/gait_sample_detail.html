@@ -56,9 +56,15 @@
 				<label>Markers</label>
 				<input ng-model='positionalsData.number_markers' ng-disabled="true"></input>
 			</md-input-container>
-			<md-button aria-label='Markers' ng-click='showMarkers()'>
-				<md-tooltip>Markers</md-tooltip>
+		</md-content>
+		<md-content layout="row" ng-show='positionalsData'>
+			<md-button aria-label='Show Markers' ng-click='showMarkers()'>
+				<md-tooltip>Show markers</md-tooltip>
 				<ng-md-icon icon="assignment" size="72" postion="br"></ng-md-icon>
+			</md-button>
+			<md-button aria-label='Show angles' ng-click='showAngles()'>
+				<md-tooltip>Show angles</md-tooltip>
+				<ng-md-icon icon="navigate_before" size="72" postion="br"></ng-md-icon>
 			</md-button>
 		</md-content>
 	</div>

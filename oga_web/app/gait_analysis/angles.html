@@ -1,0 +1,49 @@
+<h3>Angles</h3>
+<div flex layout='column' ng-show='positionalsData.angles'>
+	<style>
+		table {
+		    width:100%;
+		}
+		table, th, td {
+		    border: 1px solid black;
+		    border-collapse: collapse;
+		}
+		th, td {
+		    padding: 5px;
+		    text-align: left;
+		}
+		table#t01 tr:nth-child(even) {
+		    background-color: #eee;
+		}
+		table#t01 tr:nth-child(odd) {
+		   background-color:#fff;
+		}
+		table#t01 th	{
+		    background-color: black;
+		    color: white;
+		}
+	</style>
+	<table id="t01">
+	  <tr>
+	    <th>Description</th>
+	    <th>Origin</th>		
+	    <th>Component A</th>
+	    <th>Component B</th>
+	  </tr>
+	  <tr ng-repeat='angle in positionalsData.angles track by $index'>
+		  <td>{{angle.description}}</td>
+		  <td>{{angle.origin}}</td>
+		  <td>{{angle.component_a}}</td>		
+		  <td>{{angle.component_b}}</td>
+	  </tr>
+	</table>
+</div>
+
+<div ng-hide='positionalsData.angles'>
+	<h4>No angle added</h4>
+</div>
+
+<md-button aria-label='Add a new angle' ng-click='addNewAngle()'>
+	<md-tooltip>Add a new angle</md-tooltip>
+	<ng-md-icon icon="playlist_add" size="36" postion="bl"></ng-md-icon>
+</md-button>

@@ -33,25 +33,31 @@
 			</md-button>
 		</md-content>
 	</md-sidenav>
-	<md-content layout-padding>
+	<md-content layout-padding flex>
 		<md-button ng-click="toggleLeft()" class="md-primary" hide-gt-md>
 			Open side	
 		</md-button>
-		 <form name='gaitSampleForm'>
-			 <div layout="column">
-				<div flex ng-include src="'gait_analysis/gait_sample_detail.html'" ng-show='gaitSampleEnabled || isAdding'></div>
-				<div flex ng-include src="'gait_analysis/markers.html'" ng-show="isShowMarkers"></div>
-				<div layout="row" class="oga-float-bottom-right" >
-					<md-button aria-label='Delete sample' ng-click='confirmDeletion($event)' ng-show='!isAdding'>
-						<md-tooltip>Delete sample</md-tooltip>
-						<ng-md-icon icon="delete" size="72" postion="bl"></ng-md-icon>
-					</md-button>
-					<md-button aria-label='Save sample' ng-click='saveSample()' ng-disabled='gaitSampleForm.$invalid'>
-						<md-tooltip>Save sample</md-tooltip>
-						<ng-md-icon icon="save" size="72" postion="bl"></ng-md-icon>
-					</md-button>
-				</div>
-			 </div>
-		</form>
+		<div flex ng-hide='isAddingNewAngle'>
+			<form name='gaitSampleForm'>
+				 <div layout="column" flex>
+					<div flex ng-include src="'gait_analysis/gait_sample_detail.html'" ng-show='gaitSampleEnabled || isAdding'></div>
+					<div flex ng-include src="'gait_analysis/markers.html'" ng-show="isShowMarkers"></div>
+					<div flex ng-include src="'gait_analysis/angles.html'" ng-show="isShowAngles"></div>
+
+					<div layout="row" class="oga-float-bottom-right" >
+						<md-button aria-label='Delete sample' ng-click='confirmDeletion($event)' ng-show='!isAdding'>
+							<md-tooltip>Delete sample</md-tooltip>
+							<ng-md-icon icon="delete" size="72" postion="bl"></ng-md-icon>
+						</md-button>
+						<md-button aria-label='Save sample' ng-click='saveSample()' ng-disabled='gaitSampleForm.$invalid'>
+							<md-tooltip>Save sample</md-tooltip>
+							<ng-md-icon icon="save" size="72" postion="bl"></ng-md-icon>
+						</md-button>
+					</div>
+				 </div>
+			</form>
+		</div>
+		<div flex ng-include src="'gait_analysis/new_angle.html'" ng-show="isAddingNewAngle"></div>
+
 	</md-content>
 </section> 
