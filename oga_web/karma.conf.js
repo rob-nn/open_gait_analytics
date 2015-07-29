@@ -15,6 +15,7 @@ module.exports = function(config){
       'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
       'app/bower_components/ng-file-upload/ng-file-upload.js',
       "app/bower_components/ng-file-upload/ng-file-upload-shim.js",
+      "app/bower_components/three.js/three.min.js", 
       'app/components/**/*.js',
       'app/app.js',
       'app/oga_facade/build-mocked-patients.js',

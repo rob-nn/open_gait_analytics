@@ -19,6 +19,7 @@
     "angular-messages": "1.4.x",
     "angular-native-picker": "1.0.x",
     "ng-file-upload": "",
-    "ng-file-upload-shim": ""
+    "ng-file-upload-shim": "",
+    "three.js": "0.71.x"
   }
 }
