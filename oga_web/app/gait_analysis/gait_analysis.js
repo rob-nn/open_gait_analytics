@@ -33,11 +33,12 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.patient = patient.data;
 	$scope.isAdding = false;
 	$scope.isAddingNewAngle = false;
+	$scope.isPlaySample = false;
+	$scope.isShowMarkers = false;
+	$scope.isShowAngles = false;
 	$scope.gaitSampleEnabled = false;
 	$scope.gait_sample = null;
 	$scope.positionalsData = null;
-	$scope.isShowMarkers = false;
-	$scope.isShowAngles = false;
 	$scope.angle = null;
 
 	$scope.addNewAngle = addNewAngle;
@@ -49,6 +50,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.setFile = setFile;
 	$scope.cancel = cancel;
 	$scope.confirmDeletion = confirmDeletion;
+	$scope.playGaitSample = playGaitSample;
 	$scope.saveNewAngle = saveNewAngle;
 	$scope.saveSample= saveSample;
 	$scope.showMarkers = showMarkers;
@@ -95,6 +97,48 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			make_toast('Canceled');
 		});
 	};
+
+	function playGaitSample() {
+		$scope.isPlaySample = true;
+		init();
+		function init() {
+			var content = document.getElementById("md-content-gait-sample-detail");
+			var canvas = document.getElementById("webgl_output");
+
+			var scene = new THREE.Scene();
+
+			var camera = new THREE.PerspectiveCamera(45, content.clientWidth / content.clientHeight, 0.1, 1000); 
+			camera.position.x = -30;
+			camera.position.y = 40;
+			camera.position.z = 30;
+			camera.lookAt(scene.position);
+
+			var renderer = new THREE. WebGLRenderer();
+			renderer.setClearColor(0x000000);
+			renderer.setSize(content.clientWidth, content.clientHeight);
+
+			var planeGeometry = new THREE.PlaneGeometry(60, 20, 1, 1);
+			var planeMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc});
+			var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+			scene.add(plane);
+
+			canvas.appendChild(renderer.domElement);
+			renderer.render(scene, camera);	
+
+			window.removeEventListener('resize', onResize);
+			window.addEventListener('resize', onResize, false);
+
+			function onResize() {
+				if ($scope.isPlaySample) {
+					camera.aspect = content.clientWidth / content.clientHeight;
+					camera.updateProjectionMatrix();
+					renderer.setSize(content.clientWidth, content.clientHeight);
+					renderer.render(scene, camera);	
+				}
+			}
+		}
+	}
+
 	function saveNewAngle() {
 		if (!$scope.positionalsData.angles) {
 			$scope.positionalsData.angles=[];
@@ -130,6 +174,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		$scope.isShowMarkers = false;
 		$scope.isShowAngles = false;
 		$scope.isAddingNewAngle = false;
+		$scope.isPlaySample = false;
 	}
 
 	function upload (files){
@@ -160,6 +205,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		$scope.gaitSampleEnabled = false;
 		$scope.isShowMarkers = false;
 		$scope.isShowAngles = false;
+		$scope.isPlaySample = false;
 	};
 	function setFile(element) {
 		$scope.currentFile = element.files[0];

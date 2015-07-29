@@ -30,6 +30,7 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.patient.gait_samples).toBeDefined();
 		expect($scope.isShowMarkers).toBe(false);
 		expect($scope.positionalsData).toBe(null);
+		expect($scope.isPlaySample).toBe(false);
 	};
 
 	it('Test initial state without gait samples', function () {
@@ -53,6 +54,7 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.patient.gait_samples).toBeDefined();
 		expect($scope.isShowMarkers).toEqual(false);
 		expect($scope.positionalsData).toEqual(null);
+		expect($scope.isPlaySample).toEqual(false);
 	});
 	it('Test add gait sample state after edit markers', function(){
 		$scope.addGaitData();
@@ -107,6 +109,7 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.positionalsData).toBeDefined();
 		expect($scope.positionalsData._id).toBeDefined();
 		expect($scope.positionalsData._id).toBe(11);
+		expect($scope.isPlaySample = false);
 	});
 
 
