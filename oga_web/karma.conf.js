@@ -16,6 +16,7 @@ module.exports = function(config){
       'app/bower_components/ng-file-upload/ng-file-upload.js',
       "app/bower_components/ng-file-upload/ng-file-upload-shim.js",
       "app/bower_components/three.js/three.min.js", 
+      "app/bower_components/three.js-controls/src/TrackballControls.js", 
       'app/components/**/*.js',
       'app/app.js',
       'app/oga_facade/build-mocked-patients.js',

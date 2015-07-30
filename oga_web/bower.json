@@ -20,6 +20,7 @@
     "angular-native-picker": "1.0.x",
     "ng-file-upload": "",
     "ng-file-upload-shim": "",
-    "three.js": "0.71.x"
+    "three.js": "0.71.x",
+    "three.js-controls": "0.0.x"
   }
 }

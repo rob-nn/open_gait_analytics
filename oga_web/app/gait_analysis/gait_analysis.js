@@ -102,15 +102,16 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		$scope.isPlaySample = true;
 		init();
 		function init() {
+			var padding = 0;
 			var content = document.getElementById("md-content-gait-sample-detail");
 			var canvas = document.getElementById("webgl_output");
 
 			var scene = new THREE.Scene();
 
-			var camera = new THREE.PerspectiveCamera(45, content.clientWidth / content.clientHeight, 0.1, 1000); 
-			camera.position.x = -30;
-			camera.position.y = 40;
-			camera.position.z = 30;
+			var camera = new THREE.PerspectiveCamera(45, (content.clientWidth - padding) / (content.clientHeight - padding), 0.1, 1000); 
+			camera.position.x = 100;
+			camera.position.y = 100;
+			camera.position.z = 100;
 			camera.lookAt(scene.position);
 
 			var renderer = new THREE. WebGLRenderer();
@@ -120,22 +121,67 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			var planeGeometry = new THREE.PlaneGeometry(60, 20, 1, 1);
 			var planeMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc});
 			var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+			plane.rotation.x = -0.5 * Math.PI;
+			plane.position.x = 15;
+			plane.position.y = 0;
+			plane.position.z = 0;
 			scene.add(plane);
 
+			var sphereGeometry = new THREE.SphereGeometry(4, 20, 20);
+			var sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
+			var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+			sphere.position.x = 20;
+			sphere.position.y = 4;
+			sphere.position.z = 2;
+
+			scene.add(sphere);
+
+			var trackballControls = new THREE.TrackballControls(camera);
+			trackballControls.rotateSpeed = 0.5;
+			trackballControls.zoomSpeed = 0.5;
+			trackballControls.panSpeed = 0.5;
+
 			canvas.appendChild(renderer.domElement);
-			renderer.render(scene, camera);	
 
 			window.removeEventListener('resize', onResize);
 			window.addEventListener('resize', onResize, false);
 
+			var clock = new THREE.Clock();
+			var animationId = null;
+
+			render();
+
 			function onResize() {
 				if ($scope.isPlaySample) {
-					camera.aspect = content.clientWidth / content.clientHeight;
+					var width = content.clientWidth - padding;
+					var height = content.clientHeight - padding;
+					camera.aspect = width / height;
 					camera.updateProjectionMatrix();
-					renderer.setSize(content.clientWidth, content.clientHeight);
+					renderer.setSize(width, height);
 					renderer.render(scene, camera);	
 				}
-			}
+			};
+
+			function render() {
+				if ($scope.isPlaySample) {
+					var delta = clock.getDelta();
+					trackballControls.update(delta);
+
+					sphere.position.x += 1;
+					if (sphere.position.x >= 100){
+						sphere.position.x = 0;
+					}
+
+					animationId = requestAnimationFrame(render);
+					renderer.render(scene, camera);
+				} else {
+					window.removeEventListener('resize', onResize);
+					if (animationId) 
+						window.cancelAnimationFrame(animationId);
+					while(canvas.hasChildNodes())
+						canvas.removeChild(canvas.childNodes[0]);
+				}
+			};
 		}
 	}
 
