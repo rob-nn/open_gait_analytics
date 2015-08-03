@@ -122,7 +122,7 @@ class TestRest(unittest.TestCase):
 	for marker in positional_data['markers']:
 		self.assertEqual(marker, '')
 
-    def test_gait_sample_upload_update(self):
+    def test_gait_sample_upload_update_and_get_trajectories(self):
         patient = {'name': 'Roberto', 'gait_samples' : [{'description': 'walk 1'}, {'description': 'walk 2'}]}
 	patient_id = self.db.patients.insert_one(patient).inserted_id
 	patient = self.db.patients.find_one({'_id': patient_id})	
@@ -130,16 +130,16 @@ class TestRest(unittest.TestCase):
 	url = url_for('oga_api_0_0.gait_sample_upload', patient_id=patient_id, gait_sample_index=0)
 	r = self.client.post(url, data = {'file': (qtm_file, 'Walk2.mat'),})
         qtm_file.close()
-	qtm_file = open('oga_api/etl/Walk2.mat')
-	self.assertEqual(r.status_code, 200)
-        url = url_for('oga_api_0_0.gait_sample_upload', patient_id=patient_id, gait_sample_index=0)
-	r = self.client.post(url, data = {'file': (qtm_file, 'Walk2.mat'),})
-        qtm_file.close()
         count = self.db.positionals_data.count({'patient_id': ObjectId(patient_id), 'gait_sample_index': 0})
         self.assertEqual(count, 1)
         count = self.db.positionals_data.count({'patient_id': ObjectId(patient_id)})
         self.assertEqual(count, 1)
-
+        #check get trajectories
+        pos = self.db.positionals_data.find_one({'patient_id': ObjectId(patient_id), 'gait_sample_index': 0})
+        url = url_for('oga_api_0_0.get_trajectories', id_positionals = pos['_id'])
+        r = self.client.get(url)
+	trajectories = json_util.loads(r.data.decode('utf-8')) 
+        self.assertTrue(type(trajectories) is list)
 
     def test_gait_sample_upload_two_times(self):
         patient = {'name': 'Roberto', 'gait_samples' : [{'description': 'walk 1'}, {'description': 'walk 2'}]}

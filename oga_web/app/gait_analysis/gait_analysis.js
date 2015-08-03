@@ -33,7 +33,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.patient = patient.data;
 	$scope.isAdding = false;
 	$scope.isAddingNewAngle = false;
-	$scope.isPlaySample = false;
 	$scope.isShowMarkers = false;
 	$scope.isShowAngles = false;
 	$scope.gaitSampleEnabled = false;
@@ -56,6 +55,15 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.showMarkers = showMarkers;
 	$scope.showAngles = showAngles;
 	$scope.goBack = goBack;
+
+	$scope.isPlaySample = false;
+	$scope.loading = true;
+	$scope.$watch('isPlaySample', function (newValue, oldValue) {
+		if (!newValue && !$scope.loading) {
+			$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid + '/');
+		}
+		$scope.loading = false;
+	});
 
 	if ($scope.gait_sample == null){
 		if ($scope.patient.gait_samples && $scope.patient.gait_samples.length > 0){
@@ -105,38 +113,40 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			var padding = 0;
 			var content = document.getElementById("md-content-gait-sample-detail");
 			var canvas = document.getElementById("webgl_output");
-
 			var scene = new THREE.Scene();
-
 			var camera = new THREE.PerspectiveCamera(45, (content.clientWidth - padding) / (content.clientHeight - padding), 0.1, 1000); 
-			camera.position.x = 100;
-			camera.position.y = 100;
-			camera.position.z = 100;
-			camera.lookAt(scene.position);
-
 			var renderer = new THREE. WebGLRenderer();
-			renderer.setClearColor(0x000000);
-			renderer.setSize(content.clientWidth, content.clientHeight);
-
 			var planeGeometry = new THREE.PlaneGeometry(60, 20, 1, 1);
 			var planeMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc});
 			var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+			var sphereGeometry = new THREE.SphereGeometry(4, 20, 20);
+			var sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
+			var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+			var trackballControls = new THREE.TrackballControls(camera, content);
+			var clock = new THREE.Clock();
+			var animationId = null;
+
+
+			camera.position.x = 0;
+			camera.position.y = 0;
+			camera.position.z = 200;
+			camera.lookAt(scene.position);
+
+			renderer.setClearColor(0x000000);
+			renderer.setSize(content.clientWidth, content.clientHeight);
+
 			plane.rotation.x = -0.5 * Math.PI;
 			plane.position.x = 15;
 			plane.position.y = 0;
 			plane.position.z = 0;
 			scene.add(plane);
 
-			var sphereGeometry = new THREE.SphereGeometry(4, 20, 20);
-			var sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
-			var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-			sphere.position.x = 20;
-			sphere.position.y = 4;
-			sphere.position.z = 2;
+			sphere.position.x = 500;
+			sphere.position.y = 10;
+			sphere.position.z = 0;
 
 			scene.add(sphere);
 
-			var trackballControls = new THREE.TrackballControls(camera);
 			trackballControls.rotateSpeed = 0.5;
 			trackballControls.zoomSpeed = 0.5;
 			trackballControls.panSpeed = 0.5;
@@ -145,9 +155,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 
 			window.removeEventListener('resize', onResize);
 			window.addEventListener('resize', onResize, false);
-
-			var clock = new THREE.Clock();
-			var animationId = null;
 
 			render();
 
@@ -167,7 +174,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 					var delta = clock.getDelta();
 					trackballControls.update(delta);
 
-					sphere.position.x += 1;
+					//sphere.position.x += 1;
 					if (sphere.position.x >= 100){
 						sphere.position.x = 0;
 					}
@@ -180,6 +187,22 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 						window.cancelAnimationFrame(animationId);
 					while(canvas.hasChildNodes())
 						canvas.removeChild(canvas.childNodes[0]);
+					padding = null;
+					content = null;
+					canvas.appendChild("");
+					canvas = null;
+					scene = null;
+					camera = null;
+					renderer = null;
+					planeGeometry = null;
+					planeMaterial = null;
+					plane = null;
+					sphereGeometry = null;
+					sphereMaterial = null;
+					sphere = null;
+					trackballControls = null;
+					clock = null;
+					animationId = null;
 				}
 			};
 		}

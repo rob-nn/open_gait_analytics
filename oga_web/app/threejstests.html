@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="en" ng-app="oga_web" class="no-js"> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>ThreeJS</title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+	<body>
+		<div id="webgl_output" style="width: 800px; height: 800px;"></div>
+		<form>
+			<input type="text"></input>
+		</form>
+		<script src="bower_components/three.js/three.min.js"></script>
+		<script src="bower_components/three.js-controls/src/TrackballControls.js"></script>
+		<script>
+			init();
+			function init() {
+				var padding = 0;
+				var content = { clientWidth : 800, clientHeight : 800};
+				var canvas = document.getElementById("webgl_output");
+				var scene = new THREE.Scene();
+				var camera = new THREE.PerspectiveCamera(45, (content.clientWidth - padding) / (content.clientHeight - padding), 0.1, 1000); 
+				var renderer = new THREE.WebGLRenderer();
+				var planeGeometry = new THREE.PlaneGeometry(60, 20, 1, 1);
+				var planeMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc});
+				var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+				var sphereGeometry = new THREE.SphereGeometry(4, 20, 20);
+				var sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
+				var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+				var trackballControls = new THREE.TrackballControls(camera, canvas);
+				var clock = new THREE.Clock();
+				var animationId = null;
+
+
+				camera.position.x = 100;
+				camera.position.y = 100;
+				camera.position.z = 100;
+				camera.lookAt(scene.position);
+
+				renderer.setClearColor(0x000000);
+				renderer.setSize(content.clientWidth, content.clientHeight);
+
+				plane.rotation.x = -0.5 * Math.PI;
+				plane.position.x = 15;
+				plane.position.y = 0;
+				plane.position.z = 0;
+				scene.add(plane);
+
+				sphere.position.x = 20;
+				sphere.position.y = 4;
+				sphere.position.z = 2;
+
+				scene.add(sphere);
+
+				trackballControls.rotateSpeed = 0.5;
+				trackballControls.zoomSpeed = 0.5;
+				trackballControls.panSpeed = 0.5;
+				trackballControls.target.set(0, 0, 0);
+
+				canvas.appendChild(renderer.domElement);
+
+				window.removeEventListener('resize', onResize);
+				window.addEventListener('resize', onResize, false);
+
+				render();
+
+				function onResize() {
+					var width = content.clientWidth - padding;
+					var height = content.clientHeight - padding;
+					camera.aspect = width / height;
+					camera.updateProjectionMatrix();
+					renderer.setSize(width, height);
+					renderer.render(scene, camera);	
+				};
+
+				function render() {
+
+					sphere.position.x += 1;
+
+					if (sphere.position.x >= 100){
+						sphere.position.x = 0;
+					}
+
+					var delta = clock.getDelta();
+					animationId = requestAnimationFrame(render);
+					trackballControls.update(delta);
+					renderer.render(scene, camera);
+						/*
+						window.removeEventListener('resize', onResize);
+						if (animationId) 
+							window.cancelAnimationFrame(animationId);
+						while(canvas.hasChildNodes())
+							canvas.removeChild(canvas.childNodes[0]);
+						padding = null;
+						content = null;
+						canvas = null;
+						scene = null;
+						camera = null;
+						renderer = null;
+						planeGeometry = null;
+						planeMaterial = null;
+						plane = null;
+						sphereGeometry = null;
+						sphereMaterial = null;
+						sphere = null;
+						trackballControls = null;
+						clock = null;
+						animationId = null;
+						*/
+				};
+			}
+
+
+		</script>
+	</body>
+</html>

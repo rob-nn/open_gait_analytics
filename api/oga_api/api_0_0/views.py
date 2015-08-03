@@ -80,6 +80,15 @@ def get_positional_data(id_patient, gait_sample_index):
     else:
         return jsonify({'error': 'not found'}), 404 
 
+@main_blueprint.route('/gait_sample/positional_data/<id_positionals>/trajectories/', methods=["GET"])
+def get_trajectories(id_positionals):
+    db = get_db()
+    pos = db.positionals_data.find_one({'_id': ObjectId(id_positionals)})
+    if pos and 'trajectories' in pos.keys():
+        return json_util.dumps(pos['trajectories']), 200
+    else:
+        return jsonify({'error': 'not found'}), 404 
+
 @main_blueprint.route('/gait_sample/positionals_data/', methods=['PUT'])
 def update_positional_data():
     db = get_db()
