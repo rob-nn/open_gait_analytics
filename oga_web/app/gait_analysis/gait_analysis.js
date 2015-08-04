@@ -29,7 +29,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	urlApi,
 	patientsFacade,
 	positionalsDataFacade){
-
 	$scope.patient = patient.data;
 	$scope.isAdding = false;
 	$scope.isAddingNewAngle = false;
@@ -39,7 +38,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.gait_sample = null;
 	$scope.positionalsData = null;
 	$scope.angle = null;
-
 	$scope.addNewAngle = addNewAngle;
 	$scope.cancelNewAngle = cancelNewAngle;
 	$scope.showGraphic = showGraphic;
@@ -55,7 +53,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.showMarkers = showMarkers;
 	$scope.showAngles = showAngles;
 	$scope.goBack = goBack;
-
 	$scope.isPlaySample = false;
 	$scope.loading = true;
 	$scope.$watch('isPlaySample', function (newValue, oldValue) {
@@ -64,7 +61,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		}
 		$scope.loading = false;
 	});
-
 	if ($scope.gait_sample == null){
 		if ($scope.patient.gait_samples && $scope.patient.gait_samples.length > 0){
 			$scope.showGaitSample($scope.patient.gait_samples[0]);
@@ -107,45 +103,46 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	};
 
 	function playGaitSample() {
-		$scope.isPlaySample = true;
-		init();
-		function init() {
+		positionalsDataFacade.getTrajectories($scope.positionalsData._id.$oid).success(function(data, status, headers, config) {
+			$scope.isPlaySample = true;
+			init(data, $scope.positionalsData.frames);
+		}).error(function(data, status, headers, config) {
+			make_toast('Trajectories not found');
+		});
+
+		function init(data, frames) {
+
 			var padding = 0;
 			var content = document.getElementById("md-content-gait-sample-detail");
 			var canvas = document.getElementById("webgl_output");
 			var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera(45, (content.clientWidth - padding) / (content.clientHeight - padding), 0.1, 1000); 
+			var camera = new THREE.PerspectiveCamera(45, (content.clientWidth - padding) / (content.clientHeight - padding), 0.1, 10000); 
 			var renderer = new THREE. WebGLRenderer();
-			var planeGeometry = new THREE.PlaneGeometry(60, 20, 1, 1);
-			var planeMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc});
-			var plane = new THREE.Mesh(planeGeometry, planeMaterial);
-			var sphereGeometry = new THREE.SphereGeometry(4, 20, 20);
+			var sphereGeometry = new THREE.SphereGeometry(20, 20, 20);
 			var sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
-			var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 			var trackballControls = new THREE.TrackballControls(camera, content);
 			var clock = new THREE.Clock();
 			var animationId = null;
+			var spheres = [];
+			var frame = 0;
+			var axes = new THREE.AxisHelper(5000);
+			scene.add(axes);
 
 
-			camera.position.x = 0;
-			camera.position.y = 0;
-			camera.position.z = 200;
+			camera.position.x = 4000;
+			camera.position.y = 4000;
+			camera.position.z = 4000;
 			camera.lookAt(scene.position);
 
 			renderer.setClearColor(0x000000);
 			renderer.setSize(content.clientWidth, content.clientHeight);
 
-			plane.rotation.x = -0.5 * Math.PI;
-			plane.position.x = 15;
-			plane.position.y = 0;
-			plane.position.z = 0;
-			scene.add(plane);
 
-			sphere.position.x = 500;
-			sphere.position.y = 10;
-			sphere.position.z = 0;
-
-			scene.add(sphere);
+			for (var i =0; i < data.length; i++) {
+				var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+				spheres.push(sphere);
+				scene.add(sphere);
+			}
 
 			trackballControls.rotateSpeed = 0.5;
 			trackballControls.zoomSpeed = 0.5;
@@ -174,9 +171,24 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 					var delta = clock.getDelta();
 					trackballControls.update(delta);
 
-					//sphere.position.x += 1;
-					if (sphere.position.x >= 100){
-						sphere.position.x = 0;
+					for (var i =0; i < data.length; i++) {
+						var x = data[i][0][frame];
+						var y = data[i][1][frame];
+						var z = data[i][2][frame];
+
+						if ( x == 0 || y == 0 || z == 0) {
+							spheres[i].visible = false;
+						} else {
+							spheres[i].position.x = x; 
+							spheres[i].position.y = z;
+							spheres[i].position.z = y;
+							spheres[i].visible = true;
+						}
+					}		
+					if (frame >= frames) {
+						frame = 0;
+					} else {
+						frame++;
 					}
 
 					animationId = requestAnimationFrame(render);
@@ -194,15 +206,14 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 					scene = null;
 					camera = null;
 					renderer = null;
-					planeGeometry = null;
-					planeMaterial = null;
-					plane = null;
 					sphereGeometry = null;
 					sphereMaterial = null;
-					sphere = null;
+					spheres = [];
 					trackballControls = null;
 					clock = null;
 					animationId = null;
+					frame = 0;
+					axes = null;
 				}
 			};
 		}

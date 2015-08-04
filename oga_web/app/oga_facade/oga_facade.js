@@ -46,11 +46,17 @@ angular.module('oga_web.oga_facade', [])
 	var _deletePositionalsData = function (idPos) {
 		return $http.delete(urlApi.urlString() + 'gait_sample/positionals_data/' + idPos + '/');
 	};
+
+	var _getTrajectories = function (idPos) {
+		return $http.get(urlApi.urlString() + 'gait_sample/positional_data/'+ idPos +'/trajectories/');
+	}
 	return {
 		getPositionalsData : _getPositionalsData, 
+		getTrajectories: _getTrajectories, 
 		updatePositionalsData : _updatePositionalsData, 
 		plotMarker: _plotMarker,
 		deletePositionalsData: _deletePositionalsData
+		
 	};
 });
 

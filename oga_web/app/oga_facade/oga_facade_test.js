@@ -18,6 +18,8 @@ describe ('Patients Facade specification.',function(){
 			expect(data).toBeDefined();
 			expect(data.length).toEqual(2);
 			expect(status).toEqual(200);
+		}).error(function(method, url, data) {
+			fail();
 		});
 		$httpBackend.flush();
 	});;
@@ -30,6 +32,8 @@ describe ('Patients Facade specification.',function(){
 		patientsFacade.getPatient(1).success(function(data, status){
 			expect(data).toEqual(mockedPatients.getPatient(1));
 			expect(status).toEqual(200);
+		}).error(function(method, url, data) {
+			fail();
 		});
 		$httpBackend.flush();
 	});
@@ -43,6 +47,8 @@ describe ('Patients Facade specification.',function(){
 		patientsFacade.addPatient(patient).success(function(data, status){
 			expect(data.name).toEqual(patient.name);
 			expect(status).toEqual(201);
+		}).error(function(method, url, data) {
+			fail();
 		});
 		$httpBackend.flush();
 	});
@@ -57,6 +63,8 @@ describe ('Patients Facade specification.',function(){
 
 		patientsFacade.updatePatient(patient).success(function(data, status){
 			expect(status).toEqual(200);	
+		}).error(function(method, url, data) {
+			fail();
 		});
 		$httpBackend.flush();
 	});
@@ -80,6 +88,8 @@ describe('PositionalsData especification tests', function(){
 			expect(status).toEqual(200);
 			expect(data).toBeDefined();
 			expect(data._id).toEqual(0);
+		}).error(function(method, url, data) {
+			fail();
 		});
 		$httpBackend.flush();
 	});
@@ -94,6 +104,8 @@ describe('PositionalsData especification tests', function(){
 		var pos = {'_id': 0}
 		positionalsDataFacade.updatePositionalsData(pos).success(function(data, status){
 			expect(status).toEqual(200);
+		}).error(function(method, url, data) {
+			fail();
 		});
 		$httpBackend.flush()
 	});
@@ -104,6 +116,8 @@ describe('PositionalsData especification tests', function(){
 		});	
 		positionalsDataFacade.deletePositionalsData(0).success(function(data, status){
 			expect(status).toEqual(200);
+		}).error(function(method, url, data) {
+			fail();
 		});
 		$httpBackend.flush();
 	});
@@ -114,9 +128,22 @@ describe('PositionalsData especification tests', function(){
 		});
 		positionalsDataFacade.plotMarker(1, 2).success(function(data, status) {
 			expect(status).toEqual(200);
+		}).error(function(method, url, data) {
+			fail();
 		});
 		$httpBackend.flush();
 	});
 
+	it('Must get trajectories from positionals data', function() {
+		$httpBackend.whenGET(webapi + 'gait_sample/positional_data/00000000/trajectories/').respond(function(method, url, data) {
+			return [200, {}, {}];
+		});
+		positionalsDataFacade.getTrajectories('00000000').success(function(data, status) {
+			expect(status).toEqual(200);
+		}).error(function(method, url, data) {
+			fail();
+		});
+		$httpBackend.flush();
+	});
 });
 

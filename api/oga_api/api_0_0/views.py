@@ -85,7 +85,8 @@ def get_trajectories(id_positionals):
     db = get_db()
     pos = db.positionals_data.find_one({'_id': ObjectId(id_positionals)})
     if pos and 'trajectories' in pos.keys():
-        return json_util.dumps(pos['trajectories']), 200
+        trajectories = [[[trajectorie if not np.isnan(trajectorie) else 0 for trajectorie in column] for column in line] for line in pos['trajectories']]
+        return json_util.dumps(trajectories, allow_nan=False), 200
     else:
         return jsonify({'error': 'not found'}), 404 
 
