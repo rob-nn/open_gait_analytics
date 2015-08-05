@@ -5,10 +5,7 @@
 		    width:100%;
 		}
 		table, th, td {
-		    border: 1px solid black;
 		    border-collapse: collapse;
-		}
-		th, td {
 		    padding: 5px;
 		    text-align: left;
 		}
@@ -29,12 +26,27 @@
 	    <th>Origin</th>		
 	    <th>Component A</th>
 	    <th>Component B</th>
+	    <th></th>
+	    <th></th>
 	  </tr>
-	  <tr ng-repeat='angle in positionalsData.angles track by $index'>
-		  <td>{{angle.description}}</td>
-		  <td>{{angle.origin}}</td>
-		  <td>{{angle.component_a}}</td>		
-		  <td>{{angle.component_b}}</td>
+	  <tr ng-repeat='ang in positionalsData.angles track by $index'>
+		  <td>{{ang.description}}</td>
+		  <td>{{formatMarkerName(ang.origin)}}</td>
+		  <td>{{formatMarkerName(ang.component_a)}}</td>		
+		  <td>{{formatMarkerName(ang.component_b)}}</td>
+		  <td>
+			<md-button aria-label='Delete angle' ng-click='deleteAngle($event, $index)'>
+				<md-tooltip>Delete angle</md-tooltip>
+				<ng-md-icon icon="delete" size="24" postion="bl"></ng-md-icon>
+			</md-button>
+		  </td>
+		  <td>
+			<md-button aria-label='Plot angle' ng-click='plotAngle($index)'>
+				<md-tooltip>Plot angle</md-tooltip>
+				<ng-md-icon icon="image" size="24" postion="bl"></ng-md-icon>
+			</md-button>
+		  </td>
+
 	  </tr>
 	</table>
 </div>

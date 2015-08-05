@@ -1,16 +1,16 @@
-<h2>New Angle</h2>
-<form name='newAngleForm'>
+<form name="newAngleForm" ng-controller="gaitAnalysisAddNewAngleCtrl">
+	<h2>New Angle</h2>
 	<md-content flex layout='row'>
 		<md-input-container>
 			<label>Angle Description</label>
 			<input name="angle_description" ng-model='angle.description' ng-required='true'></input>
-			<ng-messages for="gaitSampleForm.angle_description.$error" multiple>
+			<ng-messages for="newAngleForm.angle_description.$error" multiple>
 				<div ng-messages-include="error_messages.html"></div>
 			</ng-messages>
 		</md-input-container>
 		<md-select name='angle_origin' ng-required='true' ng-model="angle.origin" placeholder="Origin" style="min-width: 200px;">
 			<md-option ng-repeat='marker in positionalsData.markers track by $index' value="{{$index}}">
-				{{'Marker ' + $index+ ' ' + marker}}
+				{{'Marker ' + $index + ' ' + marker}}
 			</md-option>
 		</md-select>
 		<md-select name='angle_component_a' ng-required='true' ng-model="angle.component_a" placeholder="Component A" style="min-width: 200px;">
@@ -18,7 +18,7 @@
 				{{'Marker ' + $index+ ' ' + marker}}
 			</md-option>
 		</md-select>
-		<md-select name='angle_component_b' ng-required='true' ng-model="angle.componet_b" placeholder="Component B" style="min-width: 200px;">
+		<md-select name='angle_component_b' ng-required='true' ng-model="angle.component_b" placeholder="Component B" style="min-width: 200px;">
 			<md-option ng-repeat='marker in positionalsData.markers track by $index' value="{{$index}}">
 				{{'Marker ' + $index+ ' ' + marker}}
 			</md-option>
