@@ -110,7 +110,6 @@ def delete_positional_data(pos_id):
     else:
 	return "", 412
 
-
 @main_blueprint.route('/concept/graph')
 def get_graph():
     import matplotlib.pyplot as plt, mpld3
@@ -146,3 +145,18 @@ def plot_marker(id_positionals_data, marker_index):
     html_str = mpld3.fig_to_html(fig)
     return html_str, 200
 
+
+@main_blueprint.route('/gait_sample/<id_positionals_data>/<angle_index>/angular_velocity', methods=['GET'])
+def calc_angular_velocity(id_positionals_data, angle_index):
+    id_positionals_data = id_positionals_data
+    angle_index = int(angle_index)
+    db = get_db()
+    pos = db.positionals_data.find_one({'_id': ObjectId(id_positionals_data)})
+    if not pos:
+        return jsonify({'error': 'Positionals data not found. Oid:' + id_positionals_data}), 404 
+    if not pos.contains_key('angles'):
+        return jsonify({'error' : 'Positionals data doesn\'t contains angles.'}), 404
+
+    angles = pos['angles']
+    if angle_index < 0 or angle_index >= len(angles):
+        return jsonify({'error' : 'Marker index invalid'}), 404 

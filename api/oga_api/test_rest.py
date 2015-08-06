@@ -122,6 +122,12 @@ class TestRest(unittest.TestCase):
 	for marker in positional_data['markers']:
 		self.assertEqual(marker, '')
 
+        #test angular velocities
+
+
+
+
+
     def test_gait_sample_upload_update_and_get_trajectories(self):
         patient = {'name': 'Roberto', 'gait_samples' : [{'description': 'walk 1'}, {'description': 'walk 2'}]}
 	patient_id = self.db.patients.insert_one(patient).inserted_id
