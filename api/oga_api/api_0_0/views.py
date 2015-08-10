@@ -146,7 +146,7 @@ def plot_marker(id_positionals_data, marker_index):
     return html_str, 200
 
 
-@main_blueprint.route('/gait_sample/<id_positionals_data>/<angle_index>/angular_velocity', methods=['GET'])
+@main_blueprint.route('/gait_sample/<id_positionals_data>/<angle_index>/angular_velocity/', methods=['GET'])
 def calc_angular_velocity(id_positionals_data, angle_index):
     id_positionals_data = id_positionals_data
     angle_index = int(angle_index)
