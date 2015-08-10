@@ -149,4 +149,41 @@ describe('Gait Analysis controller specification', function () {
 		expect($scope.isShowMarkers).toBe(true);
 	});
 
+	it('Test add new angle', function () {
+		$scope.addNewAngle();
+		expect($scope.isAddingNewAngle).toBe(true);
+	});
+
+	it('Test save new angle', function () {
+		$httpBackend.whenGET(webapi + 'gait_sample/positional_data/0/0/').respond(function(){
+			return [200, {}, {}];
+		});
+		$httpBackend.whenPUT(webapi + 'patients/').respond(function(method, url, data, headers){
+			return [204, angular.fromJson(data), {}];
+		});
+	
+		$scope.addNewAngle();
+		$scope.angle = {'description': 'New Angle'}
+		$scope.positionalsData = {angles:[]};
+		$scope.$apply(function(){
+			$scope.$broadcast('saveNewAngle');
+		});
+		expect($scope.positionalsData.angles.length).toBe(1);
+		expect($scope.isAddingNewAngle).toBe(false);
+	});
+
+	it('Test cancel add New Angle()', function () {
+		$httpBackend.whenGET(webapi + 'gait_sample/positional_data/0/0/').respond(function(){
+			return [200, {}, {}];
+		});
+		$httpBackend.whenPUT(webapi + 'patients/').respond(function(method, url, data, headers){
+			return [204, angular.fromJson(data), {}];
+		});
+	
+		$scope.addNewAngle();		
+		$scope.$apply(function() {
+			$scope.$broadcast('cancelAddNewAngle');	
+		});
+		expect($scope.isAddingNewAngle).toBe(false);
+	});
 });

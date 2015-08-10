@@ -29,6 +29,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	urlApi,
 	patientsFacade,
 	positionalsDataFacade){
+
 	$scope.patient = patient.data;
 	$scope.isAdding = false;
 	$scope.isAddingNewAngle = false;
@@ -36,7 +37,10 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.isShowAngles = false;
 	$scope.gaitSampleEnabled = false;
 	$scope.gait_sample = null;
+	$scope.isPlaySample = false;
+	$scope.loading = true;
 	$scope.positionalsData = null;
+
 	$scope.addNewAngle = addNewAngle;
 	$scope.deleteAngle = deleteAngle;
 	$scope.formatMarkerName =   formatMarkerName ;
@@ -52,18 +56,16 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.showMarkers = showMarkers;
 	$scope.showAngles = showAngles;
 	$scope.goBack = goBack;
-	$scope.isPlaySample = false;
-	$scope.loading = true;
-	
+
 	$scope.$on('cancelAddNewAngle', function(event) {
 		$scope.isAddingNewAngle = false;
 	});
 
-	$scope.$on('saveNewAngle', function(event, angle) {
+	$scope.$on('saveNewAngle', function(event) {
 		if (!$scope.positionalsData.angles) {
 			$scope.positionalsData.angles=[];
 		}
-		$scope.positionalsData.angles.push(angle);
+		$scope.positionalsData.angles.push($scope.angle);
 		$scope.isAddingNewAngle = false;
 		$scope.saveSample();
 	});
@@ -74,6 +76,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		}
 		$scope.loading = false;
 	});
+
 	if ($scope.gait_sample == null){
 		if ($scope.patient.gait_samples && $scope.patient.gait_samples.length > 0){
 			$scope.showGaitSample($scope.patient.gait_samples[0]);
@@ -84,6 +87,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	}
 
 	function addNewAngle() {
+		$scope.angle = {};
 		$scope.isAddingNewAngle = true;
 	}
 	
@@ -108,7 +112,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			make_toast('Canceled');
 		});
 	};
-
 
 	function deleteAngle(ev, angle_index) {
 		// Appending dialog to document.body to cover sidenav in docs app
@@ -395,19 +398,15 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	};
 }).controller('gaitAnalysisAddNewAngleCtrl', function (
 	$scope) {
-	$scope.angle = {};
+
 	$scope.cancelNewAngle = cancelNewAngle;
 	$scope.saveNewAngle = saveNewAngle;
 
-	$scope.positionalsData = $scope.$parent.positionalsData; 
-	
 	function saveNewAngle() {
-		$scope.$emit('saveNewAngle', $scope.angle);
-		$scope.angle = {};
+		$scope.$emit('saveNewAngle');
 	}
 
 	function cancelNewAngle() {
-		$scope.angle = {};
-		$scope.$emit('cancelAddNewAngle', $scope.angle);
+		$scope.$emit('cancelAddNewAngle');
 	}
 });
