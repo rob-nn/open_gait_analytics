@@ -76,7 +76,16 @@ class TestRest(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         patients = json_util.loads(r.data.decode('utf-8'))
         self.assertEqual(len(patients), 2)
-	 
+            
+    def test_plot_angular_velocities(self):
+	patient = {'name': 'Roberto', 'gait_samples' : [{'description': 'walk'}]}
+	patient_id = self.db.patients.insert_one(patient).inserted_id
+	patient = self.db.patients.find_one({'_id': patient_id})
+	qtm_file = open('oga_api/etl/Walk5.mat')
+	url = url_for('oga_api_0_0.gait_sample_upload', patient_id=patient_id, gait_sample_index=0)
+	r = self.client.post(url, data = {'file': (qtm_file, 'Walk5.mat'),})
+	self.assertEqual(r.status_code, 200)
+ 
     def test_plot_marker_invalid(self) :
 	url = url_for('oga_api_0_0.plot_marker', id_positionals_data = u'000000000000000000000000', marker_index = 0)
 	r = self.client.get(url)

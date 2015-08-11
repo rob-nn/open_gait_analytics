@@ -39,10 +39,18 @@ angular.module('oga_web.oga_facade', [])
 		return $http.put(urlApi.urlString() + 'gait_sample/positionals_data/', positionalsData);
 	};
 
+
+	var _plotAngles = function (idPositionalsData, angleIndex) {
+		return $http.get(urlApi.urlString() + 'gait_sample/' + idPositionalsData + '/' + angleIndex + '/angles/');
+	}
+
+	var _plotAngularVelocities = function (idPositionalsData, angleIndex) {
+		return $http.get(urlApi.urlString() + 'gait_sample/' + idPositionalsData + '/' + angleIndex + '/angular_velocity/');
+	}
+
 	var _plotMarker = function (idPositionalsMarkers,  marker) {
 		return $http.get(urlApi.urlString() + 'gait_sample/' + idPositionalsMarkers + '/' + marker + '/');
 	};
-
 	var _deletePositionalsData = function (idPos) {
 		return $http.delete(urlApi.urlString() + 'gait_sample/positionals_data/' + idPos + '/');
 	};
@@ -54,9 +62,10 @@ angular.module('oga_web.oga_facade', [])
 		getPositionalsData : _getPositionalsData, 
 		getTrajectories: _getTrajectories, 
 		updatePositionalsData : _updatePositionalsData, 
+		plotAngles: _plotAngles,
+		plotAngularVelocities: _plotAngularVelocities, 
 		plotMarker: _plotMarker,
 		deletePositionalsData: _deletePositionalsData
-		
 	};
 });
 

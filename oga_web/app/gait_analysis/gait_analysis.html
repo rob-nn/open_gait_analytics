@@ -38,7 +38,7 @@
 			Open side	
 		</md-button>
 		<form name='gaitSampleForm'>
-			<div flex ng-hide='isAddingNewAngle || isPlaySample'>
+			<div flex ng-hide='isAddingNewAngle || isPlaySample || isShowPlot'>
 				 <div layout="column" flex>
 					<div flex ng-include src="'gait_analysis/gait_sample_detail.html'" ng-show='gaitSampleEnabled || isAdding'></div>
 					<div flex ng-include src="'gait_analysis/markers.html'" ng-show="isShowMarkers"></div>
@@ -60,6 +60,8 @@
 		<div width="100%" height="100%"  ng-show="isPlaySample" flex >
 			<div flex id='webgl_output' width="100%" height="100%" >
 			</div>
+		</div>
+		<div flex ng-show='isShowPlot' ng-include src="'gait_analysis/plot.html'">
 		</div>
 	</md-content>
 </section> 
