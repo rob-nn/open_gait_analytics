@@ -56,7 +56,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.cancel = cancel;
 	$scope.confirmDeletion = confirmDeletion;
 	$scope.playGaitSample = playGaitSample;
-	$scope.saveSample= saveSample;
+	$scope.saveSample = saveSample;
 	$scope.showMarkers = showMarkers;
 	$scope.showAngles = showAngles;
 	$scope.goBack = goBack;
