@@ -16,7 +16,6 @@ def get_db():
 @main_blueprint.route('/patients/<id>/')
 def get_patient(id):
    
-    import pdb; pdb.set_trace()
     db = get_db()
     patient = db.patients.find_one({'_id': ObjectId(id)})
     if patient:
@@ -27,7 +26,6 @@ def get_patient(id):
 @main_blueprint.route('/patients/', methods=['GET', 'POST', 'PUT'])
 def patients():
 
-    import pdb; pdb.set_trace()
     if request.method == 'GET':
 	db = get_db()
 	patients = list(db.patients.find({}))
