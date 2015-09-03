@@ -146,12 +146,12 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	function playGaitSample() {
 		positionalsDataFacade.getTrajectories($scope.positionalsData._id.$oid).success(function(data, status, headers, config) {
 			$scope.isPlaySample = true;
-			init(data, $scope.positionalsData.frames);
+			init(data, $scope.positionalsData.frames, $scope.positionalsData.frame_rate);
 		}).error(function(data, status, headers, config) {
 			make_toast('Trajectories not found');
 		});
 
-		function init(data, frames) {
+		function init(data, frames, frameRate) {
 
 			var padding = 0;
 			var content = document.getElementById("md-content-gait-sample-detail");
@@ -192,6 +192,17 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			window.removeEventListener('resize', onResize);
 			window.addEventListener('resize', onResize, false);
 
+			var pause = false;
+			var controls = new function() {
+				this.frameSpeed = 1;
+				this.play =  function () {pause = false; };
+				this.pause=  function () {pause = true; };
+			}
+			var gui = new dat.GUI();
+			gui.add(controls, 'frameSpeed', 0, 3);
+			gui.add(controls, 'pause');
+			gui.add(controls, 'play');
+
 			render();
 
 			function onResize() {
@@ -204,12 +215,11 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 					renderer.render(scene, camera);	
 				}
 			};
-
+			var time = 0;
 			function render() {
 				if ($scope.isPlaySample) {
 					var delta = clock.getDelta();
 					trackballControls.update(delta);
-
 					for (var i =0; i < data.length; i++) {
 						var x = data[i][0][frame];
 						var y = data[i][1][frame];
@@ -224,12 +234,16 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 							spheres[i].visible = true;
 						}
 					}		
-					if (frame >= frames) {
-						frame = 0;
-					} else {
-						frame++;
-					}
+					if (!pause) {
+						var tprime = (1/frameRate) * (1/controls.frameSpeed);	
+						time = time + delta;			
+						frame = Math.round(time / tprime);
 
+						if (frame > frames) {
+							frame = 0;
+							time = 0;
+						} 
+					}
 					animationId = requestAnimationFrame(render);
 					renderer.render(scene, camera);
 				} else {
@@ -252,7 +266,11 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 					animationId = null;
 					frame = 0;
 					axes = null;
+					dat.GUI.toggleHide();
+					gui = null;
+					controls = null;
 				}
+				
 			};
 		}
 	}

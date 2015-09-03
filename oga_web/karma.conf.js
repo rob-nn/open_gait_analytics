@@ -13,6 +13,7 @@ module.exports = function(config){
       'app/bower_components/angular-material-icons/angular-material-icons.js',
       'app/bower_components/angular-messages/angular-messages.js', 
       'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+      'app/bower_components/dat-gui/build/dat.gui.js',
       'app/bower_components/ng-file-upload/ng-file-upload.js',
       "app/bower_components/ng-file-upload/ng-file-upload-shim.js",
       "app/bower_components/three.js/three.min.js", 
