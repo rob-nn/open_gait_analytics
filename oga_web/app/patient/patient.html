@@ -2,27 +2,6 @@
 	<h1>{{apptitle}}</h1>
 	<span flex></span>
 </md-toolbar>
-<div layout="row" flex>
-	<form name="patientForm" novalidate>
-		<md-content layout="column">
-			<md-input-container>
-				<label>Name</label>
-				<input name="name" type=text ng-required="true" ng-model='patient.name' />
-				<ng-messages for="patientForm.name.$error" multiple>
-					<div ng-messages-include="error_messages.html"></div>
-				</ng-messages>
-			</md-input-container>
-			<md-input-container>
-				<label>Birth</label>
-				<input name='birth' ng-required="true" is-open='opened' type='date' ng-model='patient.birth'/>
-				<ng-messages for="patientForm.birth.$error" multiple>
-					<div ng-messages-include="error_messages.html"></div>
-				</ng-messages>
-			</md-input-container>
-		</md-content>
-		<md-button aria-label='Save Patient' class="oga-float-bottom-right" ng-click='save()' ng-disabled="patientForm.$invalid">
-			<md-tooltip>Save Patient</md-tooltip>
-			<ng-md-icon icon="save" size="72" postion="br"></ng-md-icon>
-		</md-button>
-	</form>
-</div>
+
+<div flex ng-include src="'patient/patient_detail.html'"></div>
+

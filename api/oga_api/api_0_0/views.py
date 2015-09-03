@@ -1,5 +1,6 @@
 from . import main_blueprint
 from oga_api import get_db_connection
+from oga_api.physics import cinematic
 from flask import current_app, request
 from flask.json import jsonify
 from pymongo import MongoClient
@@ -14,6 +15,7 @@ def get_db():
 
 @main_blueprint.route('/patients/<id>/')
 def get_patient(id):
+   
     db = get_db()
     patient = db.patients.find_one({'_id': ObjectId(id)})
     if patient:
@@ -23,6 +25,7 @@ def get_patient(id):
 
 @main_blueprint.route('/patients/', methods=['GET', 'POST', 'PUT'])
 def patients():
+
     if request.method == 'GET':
 	db = get_db()
 	patients = list(db.patients.find({}))
@@ -35,7 +38,6 @@ def patients():
 		patient = db.patients.find_one({'_id': ObjectId(patient_id)})
 		return json_util.dumps(patient), 201
 	elif request.method == 'PUT':
-		#import pdb; pdb.set_trace()
 		db.patients.replace_one({'_id': patient['_id']}, patient)
 		return json_util.dumps({"return": "Saved"}), 200
 
@@ -145,18 +147,54 @@ def plot_marker(id_positionals_data, marker_index):
     html_str = mpld3.fig_to_html(fig)
     return html_str, 200
 
-
 @main_blueprint.route('/gait_sample/<id_positionals_data>/<angle_index>/angular_velocity/', methods=['GET'])
-def calc_angular_velocity(id_positionals_data, angle_index):
+def plot_angular_velocity(id_positionals_data, angle_index):
     id_positionals_data = id_positionals_data
     angle_index = int(angle_index)
     db = get_db()
     pos = db.positionals_data.find_one({'_id': ObjectId(id_positionals_data)})
     if not pos:
         return jsonify({'error': 'Positionals data not found. Oid:' + id_positionals_data}), 404 
-    if not pos.contains_key('angles'):
+    if not 'angles' in pos:
         return jsonify({'error' : 'Positionals data doesn\'t contains angles.'}), 404
-
     angles = pos['angles']
     if angle_index < 0 or angle_index >= len(angles):
         return jsonify({'error' : 'Marker index invalid'}), 404 
+    angle = angles[angle_index]
+    t = pos['trajectories']
+    origin = t[angle['origin']][0:3][:]
+    component_a = t[angle['component_a']][0:3][:]
+    component_b = t[angle['component_b']][0:3][:]
+    av = cinematic.calc_angular_velocities(np.array(origin).T, np.array(component_a).T, np.array(component_b).T, 1/float(pos['frame_rate']))  
+    import matplotlib.pyplot as plt, mpld3
+    fig = plt.figure()
+    curve_x, = plt.plot(av, 'r')
+    plt.legend([curve_x], ['Angular Velocities'])
+    html_str = mpld3.fig_to_html(fig)
+    return html_str, 200
+
+@main_blueprint.route('/gait_sample/<id_positionals_data>/<angle_index>/angles/', methods=['GET'])
+def plot_angles(id_positionals_data, angle_index):
+    id_positionals_data = id_positionals_data
+    angle_index = int(angle_index)
+    db = get_db()
+    pos = db.positionals_data.find_one({'_id': ObjectId(id_positionals_data)})
+    if not pos:
+        return jsonify({'error': 'Positionals data not found. Oid:' + id_positionals_data}), 404 
+    if not 'angles' in pos:
+        return jsonify({'error' : 'Positionals data doesn\'t contains angles.'}), 404
+    angles = pos['angles']
+    if angle_index < 0 or angle_index >= len(angles):
+        return jsonify({'error' : 'Marker index invalid'}), 404 
+    angle = angles[angle_index]
+    t = pos['trajectories']
+    origin = t[angle['origin']][0:3][:]
+    component_a = t[angle['component_a']][0:3][:]
+    component_b = t[angle['component_b']][0:3][:]
+    a = cinematic.get_angles(np.array(origin).T, np.array(component_a).T, np.array(component_b).T)  
+    import matplotlib.pyplot as plt, mpld3
+    fig = plt.figure()
+    curve_x, = plt.plot(a, 'r')
+    plt.legend([curve_x], ['Angles'])
+    html_str = mpld3.fig_to_html(fig)
+    return html_str, 200

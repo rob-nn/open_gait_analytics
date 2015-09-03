@@ -28,6 +28,7 @@
 	    <th>Component B</th>
 	    <th></th>
 	    <th></th>
+	    <th></th>
 	  </tr>
 	  <tr ng-repeat='ang in positionalsData.angles track by $index'>
 		  <td>{{ang.description}}</td>
@@ -41,12 +42,17 @@
 			</md-button>
 		  </td>
 		  <td>
-			<md-button aria-label='Plot angle' ng-click='plotAngle($index)'>
-				<md-tooltip>Plot angle</md-tooltip>
+			<md-button aria-label='Plot angles' ng-click='plotAngle($event, $index)'>
+				<md-tooltip>Plot angles</md-tooltip>
 				<ng-md-icon icon="image" size="24" postion="bl"></ng-md-icon>
 			</md-button>
 		  </td>
-
+		  <td>
+			<md-button aria-label='Plot angluar velocities' ng-click='plotAngularVelocities($event, $index)'>
+				<md-tooltip>Plot angluar velocities</md-tooltip>
+				<ng-md-icon icon="image" size="24" postion="bl"></ng-md-icon>
+			</md-button>
+		  </td>
 	  </tr>
 	</table>
 </div>
