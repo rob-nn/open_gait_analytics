@@ -162,9 +162,9 @@ def plot_angular_velocity(id_positionals_data, angle_index):
         return jsonify({'error' : 'Marker index invalid'}), 404 
     angle = angles[angle_index]
     t = pos['trajectories']
-    origin = t[angle['origin']][0:3][:]
-    component_a = t[angle['component_a']][0:3][:]
-    component_b = t[angle['component_b']][0:3][:]
+    origin = t[int(angle['origin'])][0:3][:]
+    component_a = t[int(angle['component_a'])][0:3][:]
+    component_b = t[int(angle['component_b'])][0:3][:]
     av = cinematic.calc_angular_velocities(np.array(origin).T, np.array(component_a).T, np.array(component_b).T, 1/float(pos['frame_rate']))  
     import matplotlib.pyplot as plt, mpld3
     fig = plt.figure()
@@ -188,9 +188,9 @@ def plot_angles(id_positionals_data, angle_index):
         return jsonify({'error' : 'Marker index invalid'}), 404 
     angle = angles[angle_index]
     t = pos['trajectories']
-    origin = t[angle['origin']][0:3][:]
-    component_a = t[angle['component_a']][0:3][:]
-    component_b = t[angle['component_b']][0:3][:]
+    origin = t[int(angle['origin'])][0:3][:]
+    component_a = t[int(angle['component_a'])][0:3][:]
+    component_b = t[int(angle['component_b'])][0:3][:]
     a = cinematic.get_angles(np.array(origin).T, np.array(component_a).T, np.array(component_b).T)  
     import matplotlib.pyplot as plt, mpld3
     fig = plt.figure()
