@@ -1,0 +1,25 @@
+<md-toolbar layout="row">
+	<md-button aria-label='Menu' ng-click="goBack()">
+		<md-tooltip>Back</md-tooltip>
+		<ng-md-icon icon="arrow_back" size="48"></ng-md-icon>
+	</md-button>
+
+	<h1>{{apptitle}}</h1>
+	<span flex></span>
+</md-toolbar>
+
+<section layout='row' style="height:100%;" flex>
+	<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" flex>
+		<h2>Simulations</h2>
+		<md-button ng-click="close()" class="md-primary" hide-gt-md>
+			Close Side
+		</md-button>
+		<md-button class="md-primary md-raised" ng-click="showCmacSimulation()" >
+			CMAC
+		</md-button>
+
+	</md-sidenav>
+	<div layout="column">
+		<h1>hello</h1>
+	</div>
+</section>

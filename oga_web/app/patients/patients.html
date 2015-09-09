@@ -1,8 +1,9 @@
 <md-toolbar layout="row">
-	<md-button aria-label='Menu'>
-		<md-tooltip>Menu</md-tooltip>
-		<ng-md-icon icon="menu" size="48"></ng-md-icon>
+	<md-button aria-label='Menu' ng-click="goBack()">
+		<md-tooltip>Back</md-tooltip>
+		<ng-md-icon icon="arrow_back" size="48"></ng-md-icon>
 	</md-button>
+
 	<h1>{{apptitle}}</h1>
 	<span flex></span>
 	<md-button aria-label='List View' ng-show='showListViewIcon' ng-click='showListView()'>

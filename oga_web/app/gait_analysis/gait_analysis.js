@@ -383,7 +383,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid + '/');
 	}
 	function goBack() {
-		$location.path('/');
+		$location.path('/patients');
 	}
 	function saveSample(){
 		if ($scope.isAdding) {

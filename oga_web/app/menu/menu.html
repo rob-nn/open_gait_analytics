@@ -1,0 +1,25 @@
+<md-toolbar layout="row">
+	<h1>{{apptitle}}</h1>
+	<span flex></span>
+</md-toolbar>
+
+<md-content class="md-padding">
+	<md-card>
+		<md-card-content layout="row">
+			<md-button aria-label='Analisys' ng-click='goToPatients()'>
+				<ng-md-icon icon="photo" size="72"></ng-md-icon>
+			</md-button>
+			<h2>Analisys</h2>
+		</md-card-content>
+	</md-card>
+	</br>
+	<md-card>
+		<md-card-content layout="row">
+			<md-button aria-label='Simulation' ng-click='goToSimulations()'>
+				<ng-md-icon icon="directions_walk" size="72"></ng-md-icon>
+			</md-button>			
+			<h2>Simulation</h2>
+		</md-card-content>
+	</md-card>
+
+</md-content>

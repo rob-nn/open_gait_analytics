@@ -15,6 +15,8 @@ angular.module('oga_web.patients', ["ngRoute", "ngMaterial", "ngMdIcons", 'oga_w
 .controller('patientsCtrl', function ($rootScope, $scope, $location, patients){
 	$scope.showListViewIcon = true;
 	$scope.patients = patients.data;
+	$scope.goBack = goBack;
+
 	$scope.showListView = function() {
 		$scope.showListViewIcon = false;
 	};
@@ -27,4 +29,7 @@ angular.module('oga_web.patients', ["ngRoute", "ngMaterial", "ngMdIcons", 'oga_w
 	$scope.openGaitAnalysis = function (patient_id) {
 		$location.path('/gait_analysis/patient/' + patient_id + '/');
 	};
+	function goBack() {
+		$location.path('/');
+	}
 });
