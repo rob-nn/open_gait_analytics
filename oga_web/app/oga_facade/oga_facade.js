@@ -60,12 +60,12 @@ angular.module('oga_web.oga_facade', [])
 	}
 	return {
 		getPositionalsData : _getPositionalsData, 
-		getTrajectories: _getTrajectories, 
+		getTrajectories : _getTrajectories, 
 		updatePositionalsData : _updatePositionalsData, 
-		plotAngles: _plotAngles,
-		plotAngularVelocities: _plotAngularVelocities, 
-		plotMarker: _plotMarker,
-		deletePositionalsData: _deletePositionalsData
+		plotAngles : _plotAngles,
+		plotAngularVelocities : _plotAngularVelocities, 
+		plotMarker : _plotMarker,
+		deletePositionalsData : _deletePositionalsData
 	};
 });
 

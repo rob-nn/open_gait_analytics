@@ -89,7 +89,7 @@ describe('PositionalsData especification tests', function(){
 			expect(data).toBeDefined();
 			expect(data._id).toEqual(0);
 		}).error(function(method, url, data) {
-			fail();
+			expect(true).toEqual(false);
 		});
 		$httpBackend.flush();
 	});
