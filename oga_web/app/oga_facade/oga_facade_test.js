@@ -147,3 +147,30 @@ describe('PositionalsData especification tests', function(){
 	});
 });
 
+
+describe('Simulation', function(){
+	var simulationFacade, $httpBackend, webapi;
+
+	beforeEach(module('oga_web.oga_facade'));
+
+	beforeEach(inject(function(_simulationFacade_, _$httpBackend_, urlApi){
+		simulationFacade = _simulationFacade_;
+		$httpBackend = _$httpBackend_;
+		webapi = urlApi.urlString(); 
+	}));
+
+	it('Must call run cmac training', function(){
+		var postOk = false;
+
+		$httpBackend.whenPOST(webapi + 'simulation/cmac/training/', [0, 0, 0, 0, {}, {}]).respond(function (method, url, data) {
+			postOk = true;
+			return[200, {}, {}];
+		});
+		
+		simulationFacade.runCmacTraining(0, 0, 0, 0, {}, {}).success(function(data, status) {
+ 			expect(status).toEqual(200);
+		});
+		$httpBackend.flush();
+		expect(postOk).toEqual(true);
+	});
+});

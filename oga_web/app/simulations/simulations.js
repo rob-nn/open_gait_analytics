@@ -13,17 +13,25 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 		$location.path("/");
 	};
 })
-.controller('cmacCtrl', function($scope, patientsFacade, positionalsDataFacade, $mdToast) {
-	$scope.showSamples = showSamples;
+.controller('cmacCtrl', function($scope, patientsFacade, positionalsDataFacade, simulationFacade, $mdToast) {
+	//functions
+	$scope.runCmacTraining = runCmacTraining;
 	$scope.showInputSignals = showInputSignals;
 	$scope.showQuantization = showQuantization;
 	$scope.showQuantizationAngles = showQuantizationAngles;
-	$scope.idPatient = null;
-	$scope.markers = null;
-	$scope.indexSample = null;
+	$scope.showSamples = showSamples;
+	//Atributes
 	$scope.activationsNumber = null;
+	$scope.idPatient = null;
+	$scope.indexSample = null;
 	$scope.iterationsNumber = null;
+	$scope.markers = null;
+	$scope.outputIndex = null;
+	$scope.outputs = null;
+	$scope.patients = null;
+	$scope.pos = null; //using angles
 	$scope.trainingPercentual = null;
+
 	patientsFacade.getPatients().success(function(data, status, headers, config){
 		$scope.patients = data;
 	}).error(function(data, status, headers, config){
@@ -66,7 +74,7 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 			var markers = [];
 			for (var index=0 ; index <  data.markers.length; index++) {
 				if (data.markers[index] != null && data.markers[index].trim() != ""){
-					var marker = {description: data.markers[index]};
+					var marker = {index: index, description: data.markers[index]};
 				       markers.push(marker);	
 				}
 			}
@@ -79,6 +87,7 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 					.position('bottom right')
 					.hideDelay(3000)
 				);
+			generateOutputSignals();
 		}).error(function(data, status, headers, config){
 			$mdToast.show(
 				$mdToast.simple()
@@ -88,6 +97,67 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 			);
 		}); 
 	};
+
+	function generateOutputSignals() {
+		var outputs = [];
+		var i = 0;
+		for (var index in $scope.markers) {
+			var marker = $scope.markers[index];
+			var output = null;
+			output = {
+				index: i,
+				type: 0, //0 marker, 1 angle
+				description: 'marker - ' + marker.description + ' - x',
+				_id: marker.index,
+				component: 'x', //x, y , z to markers or a, v to angles
+				component_description: 'x'
+			};
+			outputs.push(output);
+			output = {
+				index: i,
+				type: 0, //0 marker, 1 angle
+				description: 'marker - ' + marker.description + ' - y',
+				_id: marker.index,
+				component: 'y', //x, y , z to markers or a, v to angles
+				component_description: 'y'
+			};
+			outputs.push(output);
+			output = {
+				index: i,
+				type: 0, //0 marker, 1 angle
+				description: 'marker - ' + marker.description + ' - z',
+				_id: marker.index,
+				component: 'z', //x, y , z to markers or a, v to angles
+				component_description: 'z'
+			};
+			outputs.push(output);
+			i++;
+		}
+		for (var index in $scope.pos.angles) {
+			var angle = $scope.pos.angles[index];
+			var output = null;
+			output = {
+				index: i,
+				type: 1, //0 marker, 1 angle
+				description: 'angle - ' + angle.description + ' - angles',
+				_id: index,
+				component: 'a', //x, y , z to markers or a, v to angles
+				component_description: 'angles'
+			};
+			outputs.push(output);
+			output = {
+				index: i,
+				type: 1, //0 marker, 1 angle
+				description: 'angle - ' + angle.description + ' - angular velocities',
+				_id: index,
+				component: 'v', //x, y , z to markers or a, v to angles
+				component_description: 'angular velocities'
+			};
+			outputs.push(output);
+			i++;
+		}
+		$scope.outputs = outputs;
+	}
 
 	function showQuantization(index) {
 		var marker = $scope.markers[index];
@@ -115,8 +185,28 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 			angle.showAngVel = true;
 		else
 			angle.showAngVel = false;
+	}
 
-
+	function runCmacTraining(){
+		var output = null;
+		for (var index in $scope.outputs) {
+			output = $scope.outputs[index];
+			if (output.index = $scope.outputIndex) break;
+		}
+		simulationFacade.runCmacTraining($scope.idPatient, $scope.pos._id.$oid, $scope.activationsNumber, $scope.iterationsNumber, output, 
+				$scope.markers, $scope.pos.angles).success(function(data, status, headers, config){
+			
+		}).error(function(data, status, headers, config){
+			var msg = "Error training CMAC.";
+			if (data.error) 
+				msg = msg + " " + data.error;
+			$mdToast.show(
+				$mdToast.simple()
+				.content(msg)
+				.position('bottom right')
+				.hideDelay(3000)
+			);
+		});
 	}
 });
 

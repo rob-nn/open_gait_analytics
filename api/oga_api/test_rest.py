@@ -237,3 +237,36 @@ class TestRest(unittest.TestCase):
 	url = url_for('oga_api_0_0.delete_positional_data', pos_id = ObjectId(u'000000000000000000000000'))
         r = self.client.delete(url)
         self.assertEqual(r.status_code, 412)
+
+    def test_run_cmac_training(self):
+        import oga_api.etl.qtm as qtm
+        trajectories = qtm.readQTMFile('oga_api/etl/Walk1.mat')['trajectories']
+        positional_data = {'patient_id': ObjectId(u'000000000000000000000000'), 'gait_sample_index':0, 'initial_frame':0, 'trajectories': trajectories.tolist()}
+	pos_id = self.db.positionals_data.insert_one(positional_data).inserted_id
+        markers = [
+                {
+                    u'index': 3, 
+                    u'description': 
+                    u'Marcador 1', 
+                    u'xCheckedForInput': True, 
+                    u'qx': 123, 
+                    u'zCheckedForInput': False, 
+                    u'qy': 456, 
+                    u'yCheckedForInput': True, 
+                    u'showQZ': False, 
+                    u'showQX': True, 
+                    u'showQY': True}, 
+                {u'index': 4, u'description': u'Marcador 2'}, 
+                {u'index': 5, u'description': u'Marcador 3'}]
+        cmac_config= {
+			'idPatient': u'000000000000000000000000', 
+			'idGaitSample': pos_id, 
+			'activationsNumber': 10, 
+			'iterationsNumber': 0, 
+			'output': {}, 
+			'markers': markers, 
+			'angles': {}
+                        }
+        url = url_for('oga_api_0_0.run_cmac_training')
+        r = self.client.post(url, headers={'Content-Type': 'application/json'}, data = json_util.dumps(cmac_config))
+        self.assertEqual(r.status_code, 200)

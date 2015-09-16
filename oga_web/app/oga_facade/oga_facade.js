@@ -51,6 +51,7 @@ angular.module('oga_web.oga_facade', [])
 	var _plotMarker = function (idPositionalsMarkers,  marker) {
 		return $http.get(urlApi.urlString() + 'gait_sample/' + idPositionalsMarkers + '/' + marker + '/');
 	};
+
 	var _deletePositionalsData = function (idPos) {
 		return $http.delete(urlApi.urlString() + 'gait_sample/positionals_data/' + idPos + '/');
 	};
@@ -67,5 +68,20 @@ angular.module('oga_web.oga_facade', [])
 		plotMarker : _plotMarker,
 		deletePositionalsData : _deletePositionalsData
 	};
+}).factory('simulationFacade', function($http, urlApi){
+	var _runCmacTraing = function (idPatient, idGaitSample, activationsNumber, iterationsNumber, output, markers, angles) {
+		var cmacConfig =  {
+			idPatient: idPatient, 
+			idGaitSample: idGaitSample, 
+			activationsNumber: activationsNumber, 
+			iterationsNumber: iterationsNumber, 
+			output: output, 
+			markers: markers, 
+			angles: angles
+		};
+		return $http.post(urlApi.urlString() + 'simulation/cmac/training/', cmacConfig);
+	};
+	return {
+		runCmacTraining: _runCmacTraing
+	};
 });
-

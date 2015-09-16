@@ -24,16 +24,16 @@
 		</md-input-container>
 		<md-content layout='row' ng-show='positionalsData'>
 			<md-input-container>
-				<label>Initial Frame</label>
-				<input name="initial_frame" ng-model='positionalsData.initial_frame' type='number' min='0'/>
+				<label>Initial Contact</label>
+				<input name="initial_frame" ng-model='positionalsData.initial_frame' type='number' min='0' max='positionalsData.final_frame - 1' required/>
 				<ng-messages for="gaitSampleForm.initial_frame.$error" multiple>
 					<div ng-messages-include="error_messages.html"></div>
 				</ng-messages>
 
 			</md-input-container>
 			<md-input-container>
-				<label>Final Frame</label>
-				<input name="final_frame" ng-model='positionalsData.final_frame' type='number' min='0'/>
+				<label>Terminal Swing</label>
+				<input name="final_frame" ng-model='positionalsData.final_frame' type='number' min='positionalsData.initial_frame + ' max='positionalsData.frames - 1' required/>
 				<ng-messages for="gaitSampleForm.final_frame.$error" multiple>
 					<div ng-messages-include="error_messages.html"></div>
 				</ng-messages>

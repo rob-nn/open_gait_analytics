@@ -14,7 +14,7 @@
 				</md-option>
 			</md-select>
 			<h4 ng-show="markers">Input Signals</h4>
-			<div layout="row" ng-show="markers" >
+			<div layout="column" ng-show="markers" >
 				<md-list>
 					<md-subheader>Select marker positions </md-subheader>
 					<md-list-item ng-repeat="marker in markers track by $index">
@@ -31,7 +31,6 @@
 										<ng-messages for="cmacForm.qx.$error" multiple>
 											<div ng-messages-include="error_messages.html"></div>
 										</ng-messages>
-
 									</md-input-container>
 								</div>
 								<div layout="row"><p>y</p><md-checkbox 
@@ -45,7 +44,7 @@
 										</ng-messages>
 									</md-input-container>
 								</div>
-								<div layout="row"><p>x</p><md-checkbox 
+								<div layout="row"><p>z</p><md-checkbox 
 										ng-model="marker.zCheckedForInput"
 										ng-change="showQuantization($index)"></md-checkbox>
 									<md-input-container name="qz" ng-show="marker.showQZ">
@@ -64,7 +63,7 @@
 					<md-subheader>Select angles variables </md-subheader>
 					<md-list-item ng-repeat="angle in pos.angles track by $index">
 						<div layout="row">
-							<p> {{angle.description  }} &nbsp;</p>
+							<p> {{angle.description}} &nbsp;</p>
 							<div layout="column">
 								<div layout="row"><p>Angles</p>
 									<md-checkbox ng-model="angle.anglesCheckedForInput" ng-change="showQuantizationAngles($index)"> 
@@ -89,33 +88,43 @@
 								</div>
 							</div>
 						</div>
-
 					</md-list-item>
 				</md-list>
-			</div>
-			<h4>CMAC Parameters</h4>
-			<div layout="row">
-				<md-input-container name="activationsNumber">
-					<label>Activations Number</label>
-					<input required ng-model="activationsNumber" type="number" min="1" max="999"></input>
-					<ng-messages for="cmacForm.activationsNumber.$error" multiple>
-					<div ng-messages-include="error_messages.html"></div>
-					</ng-messages>
-				</md-input-container>
-				<md-input-container name="iterationsNumber">
-					<label>Iterations Number</label>
-					<input required ng-model="iterationsNumber" type="number" min="1" max="999"></input>
-					<ng-messages for="cmacForm.iterationsNumber.$error" multiple>
-					<div ng-messages-include="error_messages.html"></div>
-					</ng-messages>
-				</md-input-container>
-				<md-input-container name="trainingPercentual">
-					<label>Training data percentual</label>
-					<input required ng-model="trainingPercentual" type="number" min="1" max="100"></input>
-					<ng-messages for="cmacForm.iterationsNumber.$error" multiple>
-					<div ng-messages-include="error_messages.html"></div>
-					</ng-messages>
-				</md-input-container>
+				<h4>CMAC Parameters</h4>
+				<div layout="row">
+					<md-input-container name="activationsNumber">
+						<label>Activations Number</label>
+						<input required ng-model="activationsNumber" type="number" min="1" max="999"></input>
+						<ng-messages for="cmacForm.activationsNumber.$error" multiple>
+						<div ng-messages-include="error_messages.html"></div>
+						</ng-messages>
+					</md-input-container>
+					<md-input-container name="iterationsNumber">
+						<label>Iterations Number</label>
+						<input required ng-model="iterationsNumber" type="number" min="1" max="999"></input>
+						<ng-messages for="cmacForm.iterationsNumber.$error" multiple>
+						<div ng-messages-include="error_messages.html"></div>
+						</ng-messages>
+					</md-input-container>
+					<!--
+						<md-input-container name="trainingPercentual">
+							<label>Training data percentual</label>
+							<input required ng-model="trainingPercentual" type="number" min="1" max="100"></input>
+							<ng-messages for="cmacForm.iterationsNumber.$error" multiple>
+							<div ng-messages-include="error_messages.html"></div>
+							</ng-messages>
+						</md-input-container>
+					-->
+					<md-select ng-model="outputIndex" placeholder="Choose a output signal" required>
+						<md-option ng-repeat="out in outputs" value="{{out.index}}">
+							{{out.description}}
+						</md-option>
+					</md-select>
+				</div>
+				<md-button aria-label='CMAC Training' ng-click='runCmacTraining()'>
+					<md-tooltip>CMAC Training</md-tooltip>
+					<ng-md-icon icon="play_circle_fill" size="72" postion="bl"></ng-md-icon>
+				</md-button>
 			</div>
 		</md-content>
 	</form>

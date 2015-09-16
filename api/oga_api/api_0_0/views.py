@@ -15,7 +15,6 @@ def get_db():
 
 @main_blueprint.route('/patients/<id>/')
 def get_patient(id):
-   
     db = get_db()
     patient = db.patients.find_one({'_id': ObjectId(id)})
     if patient:
@@ -25,7 +24,6 @@ def get_patient(id):
 
 @main_blueprint.route('/patients/', methods=['GET', 'POST', 'PUT'])
 def patients():
-
     if request.method == 'GET':
 	db = get_db()
 	patients = list(db.patients.find({}))
@@ -57,6 +55,8 @@ def gait_sample_upload(patient_id, gait_sample_index):
     positional_data['patient_id'] = ObjectId(patient_id)
     positional_data['gait_sample_index'] = gait_sample_index
     positional_data['frame_rate'] = data['frame_rate']
+    positional_data['initial_frame'] = 0
+    positional_data['final_frame'] = data['frames'] - 1
     positional_data['frames'] = data['frames']
     positional_data['number_markers'] = data['number_markers']
     positional_data['original_filename'] = qtm_matlab_file.filename
@@ -133,9 +133,10 @@ def plot_marker(id_positionals_data, marker_index):
     if marker_index >= pos['number_markers']:
         return jsonify({'error' : 'Marker index invalid'}), 404 
 
-    x =  pos['trajectories'][marker_index][0]
-    y =  pos['trajectories'][marker_index][1]
-    z =  pos['trajectories'][marker_index][2]
+    trajectories = cut_trajectories(pos) 
+    x =  trajectories[marker_index, 0, :]
+    y =  trajectories[marker_index, 1, :]
+    z =  trajectories[marker_index, 2, :]
 
     import matplotlib.pyplot as plt, mpld3
 
@@ -161,7 +162,7 @@ def plot_angular_velocity(id_positionals_data, angle_index):
     if angle_index < 0 or angle_index >= len(angles):
         return jsonify({'error' : 'Marker index invalid'}), 404 
     angle = angles[angle_index]
-    t = pos['trajectories']
+    t = cut_trajectories(pos).tolist()
     origin = t[int(angle['origin'])][0:3][:]
     component_a = t[int(angle['component_a'])][0:3][:]
     component_b = t[int(angle['component_b'])][0:3][:]
@@ -187,7 +188,7 @@ def plot_angles(id_positionals_data, angle_index):
     if angle_index < 0 or angle_index >= len(angles):
         return jsonify({'error' : 'Marker index invalid'}), 404 
     angle = angles[angle_index]
-    t = pos['trajectories']
+    t = cut_trajectories(pos).tolist()
     origin = t[int(angle['origin'])][0:3][:]
     component_a = t[int(angle['component_a'])][0:3][:]
     component_b = t[int(angle['component_b'])][0:3][:]
@@ -198,3 +199,44 @@ def plot_angles(id_positionals_data, angle_index):
     plt.legend([curve_x], ['Angles'])
     html_str = mpld3.fig_to_html(fig)
     return html_str, 200
+
+@main_blueprint.route('/simulation/cmac/training/', methods=['POST'])
+def run_cmac_training():
+    cmacConfig = json_util.loads(request.data)
+    error = ""
+    if not 'idPatient' in cmacConfig:
+        error = error + " Don't contains idPatient"
+    if not 'idGaitSample' in cmacConfig:
+        error = error + " Don't contains idGaitSample"
+    if not 'activationsNumber' in cmacConfig:
+        error = error + " Don't contains activationsNumber"
+    if not 'iterationsNumber' in cmacConfig:
+        error = error + " Don't contains iterationsNumber"
+    if not 'output' in cmacConfig:
+        error = error + " Don't contains output"
+    if not ('markers' in cmacConfig or 'angles' in cmacConfig):
+        error = error + " Don't contains markers neither angles"
+
+    if error != "":
+        return jsonify({'error': error}), 500
+
+    db = get_db()
+
+    #patient = db.patients.find_one({'_id': ObjectId(cmacConfig['idPatient'])})
+    pos = db.positionals_data.find_one({'_id': ObjectId(cmacConfig['idGaitSample'])})
+    import oga_api.ml.basic_cmac as basic_cmac
+    b_cmac = basic_cmac.BasicCMAC(cut_trajectories(pos), cmacConfig['markers'], cmacConfig['activationsNumber'], cmacConfig['iterationsNumber'])
+
+    return '', 200
+
+
+def cut_trajectories(pos):
+    trajectories = np.array(pos['trajectories'])
+    if 'initial_frame' in pos and 'final_frame' in pos and 'frames' in pos:
+        initial = pos['initial_frame'] 
+        final = pos['final_frame']
+        frames = pos['frames'] 
+        if initial >0 and initial < final and final < frames:
+            trajectories = trajectories[:,:, initial:final]
+    return trajectories
+
