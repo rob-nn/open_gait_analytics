@@ -221,7 +221,7 @@ def run_cmac_training():
         return jsonify({'error': error}), 500
 
     db = get_db()
-
+    import pdb; pdb.set_trace();
     #patient = db.patients.find_one({'_id': ObjectId(cmacConfig['idPatient'])})
     pos = db.positionals_data.find_one({'_id': ObjectId(cmacConfig['idGaitSample'])})
     import oga_api.ml.basic_cmac as basic_cmac

@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class BasicCMAC(cmac.CMAC):
-    def __init__(self, trajectories, markers, activations, num_iterations):
+    def __init__(self, trajectories, markers, activations, output, num_iterations):
         self._num_iterations = num_iterations
         confs = []
         conf = None
@@ -38,6 +38,7 @@ class BasicCMAC(cmac.CMAC):
         data_in = None
         data_test = None
         data = self._data_set
+""""kk 
         for i in range(data.shape[0]):
             new = np.reshape(data[i, :], (1, data.shape[1]))
             out = np.reshape(loader.data[i, out_index], (1,1))
@@ -60,7 +61,6 @@ class BasicCMAC(cmac.CMAC):
         self._data_out_test = data_out_test
         self._data_in = data_in
         self._data_test = data_test
-""""kk 
     def train(self): 
         if self._um_iterations < 1:
             raise ParameterInvalid('Number of iterations must be greater than 1')
