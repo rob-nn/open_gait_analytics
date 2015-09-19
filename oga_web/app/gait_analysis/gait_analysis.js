@@ -386,13 +386,34 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		$location.path('/patients');
 	}
 	function saveSample(){
+		if (!$scope.gait_sample.description) {
+			make_toast("Inform description");
+			return;
+		}
+		if (!$scope.gait_sample.date) {
+			make_toast("Inform the date");
+			return;
+		}
+
 		if ($scope.isAdding) {
 			if (typeof($scope.patient.gait_samples) === 'undefined')
 				$scope.patient.gait_samples = [];
 			$scope.patient.gait_samples.push($scope.gait_sample);
 		}
 		patientsFacade.updatePatient($scope.patient).success(function (data, status, headers, config) {
-			if (!$scope.isAdding) 
+			if (!$scope.isAdding) {
+				if (typeof($scope.positionalsData.initial_frame) === 'undefined' || $scope.positionalsData.initial_frame < 0) {
+					make_toast('Initial contact invalid. Must be greater than or equal 0');
+					return;
+				}
+				if (typeof($scope.positionalsData.final_frame) === 'undefined' || $scope.positionalsData.final_frame >= $scope.positionalsData.frames) {
+					make_toast('Terminal swing invalid. Must be less than frames');
+					return;
+				}
+				if ($scope.positionalsData.initial_frame >= $scope.positionalsData.final_frame){
+					make_toast('Initial contantct must be less than final swing');
+					return;
+				}
 				positionalsDataFacade.updatePositionalsData($scope.positionalsData).success(function(data, status, headers, config){
 					var isShowMarkers = $scope.isShowMarkers;
 					var isShowAngles = $scope.isShowAngles;
@@ -404,6 +425,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 				.error(function(data, status, headers, config){
 					make_toast('Failed');
 				});
+			}
 			else {
 				$scope.isAdding = false;
 				$scope.showGaitSample($scope.gait_sample);

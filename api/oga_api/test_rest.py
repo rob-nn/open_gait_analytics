@@ -241,7 +241,7 @@ class TestRest(unittest.TestCase):
     def test_run_cmac_training(self):
         import oga_api.etl.qtm as qtm
         trajectories = qtm.readQTMFile('oga_api/etl/Walk1.mat')['trajectories']
-        positional_data = {'patient_id': ObjectId(u'000000000000000000000000'), 'gait_sample_index':0, 'initial_frame':0, 'trajectories': trajectories.tolist()}
+	positional_data = {'patient_id': ObjectId(u'000000000000000000000000'), 'gait_sample_index':0, 'initial_frame':300, 'final_frame': 1000, 'frames': 1400, 'trajectories': trajectories.tolist()}
 	pos_id = self.db.positionals_data.insert_one(positional_data).inserted_id
         markers = [
                 {
@@ -258,12 +258,13 @@ class TestRest(unittest.TestCase):
                     u'showQY': True}, 
                 {u'index': 4, u'description': u'Marcador 2'}, 
                 {u'index': 5, u'description': u'Marcador 3'}]
+	output = {u'index': None, u'description': u'angle - teste - angular velocities', u'component_description': u'angular velocities', u'component': u'v', u'_id': u'1', u'type': 1}
         cmac_config= {
 			'idPatient': u'000000000000000000000000', 
 			'idGaitSample': pos_id, 
 			'activationsNumber': 10, 
 			'iterationsNumber': 0, 
-			'output': {}, 
+			'output': output, 
 			'markers': markers, 
 			'angles': {}
                         }

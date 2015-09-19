@@ -1,0 +1,2 @@
+cmacConfig['output']
+{u'index': None, u'description': u'angle - teste - angular velocities', u'component_description': u'angular velocities', u'component': u'v', u'_id': u'1', u'type': 1}

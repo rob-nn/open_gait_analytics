@@ -161,13 +161,22 @@ describe('Simulation', function(){
 
 	it('Must call run cmac training', function(){
 		var postOk = false;
+		var cmacConfig = {
+			idPatient: 0,
+			idGaitSample: 1,
+			activationsNumber: 2, 
+			iterationsNumber: 3, 
+			output: {a: 'a'},
+			markers: {b: 'b'},
+			angles: {c : 'c'}
+		};
 
-		$httpBackend.whenPOST(webapi + 'simulation/cmac/training/', [0, 0, 0, 0, {}, {}]).respond(function (method, url, data) {
+		$httpBackend.whenPOST(webapi + 'simulation/cmac/training/', cmacConfig).respond(function (method, url, data, headers) {
 			postOk = true;
 			return[200, {}, {}];
 		});
-		
-		simulationFacade.runCmacTraining(0, 0, 0, 0, {}, {}).success(function(data, status) {
+		activationsNumber: 2
+		simulationFacade.runCmacTraining(0, 1, 2, 3, {a: 'a'}, {b: 'b'}, {c : 'c'}).success(function(data, status) {
  			expect(status).toEqual(200);
 		});
 		$httpBackend.flush();

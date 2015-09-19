@@ -75,6 +75,8 @@ describe('Gait Analysis controller specification', function () {
 			return [404, {}, {}];
 		});
 		$scope.addGaitData();
+		$scope.gait_sample.description = "testing";
+		$scope.gait_sample.date = new Date(2011, 10, 10);
 		delete $scope.patient.gait_samples;
 		expect($scope.patient.gait_samples).toBeUndefined();
 		$scope.saveSample();

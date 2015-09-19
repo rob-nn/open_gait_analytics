@@ -133,19 +133,67 @@ def plot_marker(id_positionals_data, marker_index):
     if marker_index >= pos['number_markers']:
         return jsonify({'error' : 'Marker index invalid'}), 404 
 
+    import pdb; pdb.set_trace()
+
     trajectories = cut_trajectories(pos) 
-    x =  trajectories[marker_index, 0, :]
+    x_img =  trajectories[marker_index, 0, :]
+    x_dom = 100 * np.arange(0, len(x_img))/np.float(len(x_img))
     y =  trajectories[marker_index, 1, :]
     z =  trajectories[marker_index, 2, :]
 
-    import matplotlib.pyplot as plt, mpld3
-
     fig = plt.figure()
-    curve_x, = plt.plot(x, 'r')
-    curve_y, = plt.plot(y, 'b')
-    curve_z, = plt.plot(z, 'g')
-    plt.legend([curve_x, curve_y, curve_z], ['x', 'y', 'z'])
-    html_str = mpld3.fig_to_html(fig)
+    plt.axis([0, x_dom.max(), x_img.min(), x_img.max()])
+    lr_i = 0
+    lr_f = x_dom.max() * 0.12 
+    mst_i = lr_f
+    mst_f = x_dom.max() * 0.31
+    tst_i = mst_f
+    tst_f = x_dom.max() * 0.50
+    psw_i = tst_f
+    psw_f = x_dom.max() * 0.62
+    isw_i = psw_f
+    isw_f = x_dom.max() * 0.75
+    msw_i = isw_f
+    msw_f = x_dom.max() * 0.87
+    tsw_i = msw_f
+    tsw_f = x_dom.max() * 1
+
+    curve_x, = plt.plot(x_dom, x_img, 'r')
+    #curve_y, = plt.plot(y, 'b')
+    #curve_z, = plt.plot(z, 'g')
+    plt.axvspan(xmin = lr_i, xmax=lr_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.annotate('LR', xy=(lr_i + 5, x_img.max()))  
+    plt.axvspan(xmin = mst_i, xmax=mst_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.annotate('MSt', xy=(mst_i + 5, x_img.max()))  
+    plt.axvspan(xmin = tst_i, xmax=tst_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.annotate('TSt', xy=(tst_i + 5, x_img.max()))  
+    plt.axvspan(xmin = psw_i, xmax=psw_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.annotate('PSw', xy=(psw_i + 5, x_img.max()))  
+    plt.axvspan(xmin = isw_i, xmax=isw_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.annotate('ISw', xy=(isw_i + 5, x_img.max()))  
+    plt.axvspan(xmin = msw_i, xmax=msw_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.annotate('MSw', xy=(msw_i + 5, x_img.max()))  
+    plt.axvspan(xmin = tsw_i, xmax=tsw_f, ymin =0, ymax=1, alpha = 0.6, color='y')
+    plt.annotate('TSw', xy=(tsw_i + 5, x_img.max()))  
+
+
+
+
+
+
+
+    #plt.legend([curve_x, curve_y, curve_z], ['x', 'y', 'z'])
+    plt.legend([curve_x], ['x'])
+    import cStringIO
+    format = "png"
+    sio = cStringIO.StringIO()
+    plt.savefig(sio, format=format)
+    print "Content-Type: image/%s\n" % format
+
+    html_str = """<html><body>
+    <img src="data:image/png;base64,%s"/>
+    </body></html>""" % sio.getvalue().encode("base64").strip()
+
     return html_str, 200
 
 @main_blueprint.route('/gait_sample/<id_positionals_data>/<angle_index>/angular_velocity/', methods=['GET'])
@@ -202,6 +250,7 @@ def plot_angles(id_positionals_data, angle_index):
 
 @main_blueprint.route('/simulation/cmac/training/', methods=['POST'])
 def run_cmac_training():
+
     cmacConfig = json_util.loads(request.data)
     error = ""
     if not 'idPatient' in cmacConfig:
@@ -216,19 +265,15 @@ def run_cmac_training():
         error = error + " Don't contains output"
     if not ('markers' in cmacConfig or 'angles' in cmacConfig):
         error = error + " Don't contains markers neither angles"
-
     if error != "":
         return jsonify({'error': error}), 500
-
     db = get_db()
-    import pdb; pdb.set_trace();
     #patient = db.patients.find_one({'_id': ObjectId(cmacConfig['idPatient'])})
     pos = db.positionals_data.find_one({'_id': ObjectId(cmacConfig['idGaitSample'])})
     import oga_api.ml.basic_cmac as basic_cmac
-    b_cmac = basic_cmac.BasicCMAC(cut_trajectories(pos), cmacConfig['markers'], cmacConfig['activationsNumber'], cmacConfig['iterationsNumber'])
-
+    b_cmac = basic_cmac.BasicCMAC(cut_trajectories(pos), cmacConfig['markers'], cmacConfig['activationsNumber'], cmacConfig['output'], cmacConfig['iterationsNumber'])
+    b_cmac.train()
     return '', 200
-
 
 def cut_trajectories(pos):
     trajectories = np.array(pos['trajectories'])
