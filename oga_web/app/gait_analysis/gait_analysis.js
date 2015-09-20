@@ -29,7 +29,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	urlApi,
 	patientsFacade,
 	positionalsDataFacade){
-
 	$scope.patient = patient.data;
 	$scope.isAdding = false;
 	$scope.isAddingNewAngle = false;
@@ -202,17 +201,46 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 
 			window.removeEventListener('resize', onResize);
 			window.addEventListener('resize', onResize, false);
+			window.addEventListener('mousedown', onMouseMove,false );
+			var raycaster = new THREE.Raycaster();
+			var mouse = new THREE.Vector2();
+			function onMouseMove(event) {
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;	
+				// update the picking ray with the camera and mouse position	
+				raycaster.setFromCamera( mouse, camera );	
+
+				// calculate objects intersecting the picking ray
+				var intersects = raycaster.intersectObjects(spheres);
+
+				for ( var i = 0; i < intersects.length; i++ ) {
+
+					intersects[ i ].object.material.color.set( 0x0000ff );
+	
+				}
+
+				renderer.render( scene, camera );	
+
+			}
 
 			var pause = false;
 			var controls = new function() {
 				this.frameSpeed = 1;
 				this.play =  function () {pause = false; };
 				this.pause=  function () {pause = true; };
+				this.frames = 0;
 			}
 			var gui = new dat.GUI();
 			gui.add(controls, 'frameSpeed', 0, 3);
 			gui.add(controls, 'pause');
 			gui.add(controls, 'play');
+			gui.add(controls, 'frames', 0, $scope.positionalsData.frames).listen();
+			var last_frame = 0
+			function update_frames() {
+				requestAnimationFrame(update_frames);
+				if (controls)
+					controls.frames = last_frame;
+			}
 
 			render();
 
@@ -226,9 +254,12 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 					renderer.render(scene, camera);	
 				}
 			};
+
 			var time = 0;
 			function render() {
 				if ($scope.isPlaySample) {
+					
+
 					var delta = clock.getDelta();
 					trackballControls.update(delta);
 					for (var i =0; i < data.length; i++) {
@@ -254,6 +285,8 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 							frame = 0;
 							time = 0;
 						} 
+						last_frame = frame;
+						update_frames()
 					}
 					animationId = requestAnimationFrame(render);
 					renderer.render(scene, camera);
