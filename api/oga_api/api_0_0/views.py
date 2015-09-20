@@ -126,23 +126,25 @@ def plot_marker(id_positionals_data, marker_index):
     id_positionals_data = id_positionals_data
     marker_index = int(marker_index)
     db = get_db()
-
     pos = db.positionals_data.find_one({'_id': ObjectId(id_positionals_data)})
     if not pos:
         return jsonify({'error': 'Positionals data not found. Oid:' + id_positionals_data}), 404 
     if marker_index >= pos['number_markers']:
         return jsonify({'error' : 'Marker index invalid'}), 404 
 
-    import pdb; pdb.set_trace()
+    if pos['markers'][marker_index] =="":
+        title = 'Marker %s' % str(marker_index)
+    else:
+        title = pos['markers'][marker_index]
 
     trajectories = cut_trajectories(pos) 
     x_img =  trajectories[marker_index, 0, :]
     x_dom = 100 * np.arange(0, len(x_img))/np.float(len(x_img))
-    y =  trajectories[marker_index, 1, :]
-    z =  trajectories[marker_index, 2, :]
+    y_img =  trajectories[marker_index, 1, :]
+    y_dom = 100 * np.arange(0, len(y_img))/np.float(len(y_img))
+    z_img =  trajectories[marker_index, 2, :]
+    z_dom =  100 * np.arange(0, len(z_img))/np.float(len(z_img))
 
-    fig = plt.figure()
-    plt.axis([0, x_dom.max(), x_img.min(), x_img.max()])
     lr_i = 0
     lr_f = x_dom.max() * 0.12 
     mst_i = lr_f
@@ -158,42 +160,69 @@ def plot_marker(id_positionals_data, marker_index):
     tsw_i = msw_f
     tsw_f = x_dom.max() * 1
 
+    import matplotlib.pyplot as plt
+    fig = plt.figure(1)
+
+    plt.subplot(3,1,1)
+    plt.title(title)
+    plt.ylabel ("Spacial Data")
+    plt.xlabel ("Percentual Gait Cycle")
+    plt.axis([0, x_dom.max(), x_img.min(), x_img.max()])
     curve_x, = plt.plot(x_dom, x_img, 'r')
-    #curve_y, = plt.plot(y, 'b')
-    #curve_z, = plt.plot(z, 'g')
+    plt.legend([curve_x], ['x' ], loc='best')
     plt.axvspan(xmin = lr_i, xmax=lr_f, ymin =0, ymax=1, alpha = 0.2, color='b')
-    plt.annotate('LR', xy=(lr_i + 5, x_img.max()))  
+    plt.annotate('LR', xy=(lr_i + 5, x_img.max() * 0.95))  
     plt.axvspan(xmin = mst_i, xmax=mst_f, ymin =0, ymax=1, alpha = 0.2, color='y')
-    plt.annotate('MSt', xy=(mst_i + 5, x_img.max()))  
+    plt.annotate('MSt', xy=(mst_i + 5, x_img.max() * 0.95))  
     plt.axvspan(xmin = tst_i, xmax=tst_f, ymin =0, ymax=1, alpha = 0.4, color='y')
-    plt.annotate('TSt', xy=(tst_i + 5, x_img.max()))  
+    plt.annotate('TSt', xy=(tst_i + 5, x_img.max() * 0.95))  
     plt.axvspan(xmin = psw_i, xmax=psw_f, ymin =0, ymax=1, alpha = 0.2, color='b')
-    plt.annotate('PSw', xy=(psw_i + 5, x_img.max()))  
+    plt.annotate('PSw', xy=(psw_i + 5, x_img.max() * 0.95))  
     plt.axvspan(xmin = isw_i, xmax=isw_f, ymin =0, ymax=1, alpha = 0.2, color='y')
-    plt.annotate('ISw', xy=(isw_i + 5, x_img.max()))  
+    plt.annotate('ISw', xy=(isw_i + 5, x_img.max() * 0.95))  
     plt.axvspan(xmin = msw_i, xmax=msw_f, ymin =0, ymax=1, alpha = 0.4, color='y')
-    plt.annotate('MSw', xy=(msw_i + 5, x_img.max()))  
+    plt.annotate('MSw', xy=(msw_i + 5, x_img.max() * 0.95))  
     plt.axvspan(xmin = tsw_i, xmax=tsw_f, ymin =0, ymax=1, alpha = 0.6, color='y')
-    plt.annotate('TSw', xy=(tsw_i + 5, x_img.max()))  
+    plt.annotate('TSw', xy=(tsw_i + 5, x_img.max() * 0.95))  
 
+    plt.subplot(3,1,2)
+    plt.ylabel ("Spacial Data")
+    plt.xlabel ("Percentual Gait Cycle")
+    plt.axis([0, y_dom.max(), y_img.min(), y_img.max()])
+    curve_y, = plt.plot(y_dom, y_img, 'b')
+    plt.legend([curve_y], ['y' ], loc='best')
+    plt.axvspan(xmin = lr_i, xmax=lr_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.axvspan(xmin = mst_i, xmax=mst_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.axvspan(xmin = tst_i, xmax=tst_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.axvspan(xmin = psw_i, xmax=psw_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.axvspan(xmin = isw_i, xmax=isw_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.axvspan(xmin = msw_i, xmax=msw_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.axvspan(xmin = tsw_i, xmax=tsw_f, ymin =0, ymax=1, alpha = 0.6, color='y')
+ 
+    plt.subplot(3,1,3)
+    plt.ylabel ("Spacial Data")
+    plt.xlabel ("Percentual Gait Cycle")
+    plt.axis([0, z_dom.max(), z_img.min(), z_img.max()])
+    curve_z, = plt.plot(z_dom, z_img, 'g')
+    plt.legend([curve_z], ['z' ], loc='best')
+    plt.axvspan(xmin = lr_i, xmax=lr_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.axvspan(xmin = mst_i, xmax=mst_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.axvspan(xmin = tst_i, xmax=tst_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.axvspan(xmin = psw_i, xmax=psw_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.axvspan(xmin = isw_i, xmax=isw_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.axvspan(xmin = msw_i, xmax=msw_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.axvspan(xmin = tsw_i, xmax=tsw_f, ymin =0, ymax=1, alpha = 0.6, color='y')
 
-
-
-
-
-
-    #plt.legend([curve_x, curve_y, curve_z], ['x', 'y', 'z'])
-    plt.legend([curve_x], ['x'])
     import cStringIO
     format = "png"
     sio = cStringIO.StringIO()
     plt.savefig(sio, format=format)
-    print "Content-Type: image/%s\n" % format
 
     html_str = """<html><body>
     <img src="data:image/png;base64,%s"/>
     </body></html>""" % sio.getvalue().encode("base64").strip()
 
+    plt.close()
     return html_str, 200
 
 @main_blueprint.route('/gait_sample/<id_positionals_data>/<angle_index>/angular_velocity/', methods=['GET'])
@@ -206,20 +235,71 @@ def plot_angular_velocity(id_positionals_data, angle_index):
         return jsonify({'error': 'Positionals data not found. Oid:' + id_positionals_data}), 404 
     if not 'angles' in pos:
         return jsonify({'error' : 'Positionals data doesn\'t contains angles.'}), 404
+
     angles = pos['angles']
     if angle_index < 0 or angle_index >= len(angles):
         return jsonify({'error' : 'Marker index invalid'}), 404 
     angle = angles[angle_index]
+    
     t = cut_trajectories(pos).tolist()
+
     origin = t[int(angle['origin'])][0:3][:]
     component_a = t[int(angle['component_a'])][0:3][:]
     component_b = t[int(angle['component_b'])][0:3][:]
     av = cinematic.calc_angular_velocities(np.array(origin).T, np.array(component_a).T, np.array(component_b).T, 1/float(pos['frame_rate']))  
-    import matplotlib.pyplot as plt, mpld3
-    fig = plt.figure()
-    curve_x, = plt.plot(av, 'r')
-    plt.legend([curve_x], ['Angular Velocities'])
-    html_str = mpld3.fig_to_html(fig)
+
+    av_img = av 
+    av_dom = 100 * np.arange(0, len(av_img))/np.float(len(av_img))
+    lr_i = 0
+    lr_f = av_dom.max() * 0.12 
+    mst_i = lr_f
+    mst_f = av_dom.max() * 0.31
+    tst_i = mst_f
+    tst_f = av_dom.max() * 0.50
+    psw_i = tst_f
+    psw_f = av_dom.max() * 0.62
+    isw_i = psw_f
+    isw_f = av_dom.max() * 0.75
+    msw_i = isw_f
+    msw_f = av_dom.max() * 0.87
+    tsw_i = msw_f
+    tsw_f = av_dom.max() * 1
+
+    import matplotlib.pyplot as plt
+    fig = plt.figure(1)
+
+    plt.subplot(1,1,1)
+    plt.title("Angular Velociteis for %s" % angle['description'])
+    plt.ylabel ("Rads/Seconds")
+    plt.xlabel ("Percentual Gait Cycle")
+    plt.axis([0, av_dom.max(), av_img.min(), av_img.max()])
+    curve_av, = plt.plot(av_dom, av_img, 'r')
+    plt.axvspan(xmin = lr_i, xmax=lr_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.annotate('LR', xy=(lr_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = mst_i, xmax=mst_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.annotate('MSt', xy=(mst_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = tst_i, xmax=tst_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.annotate('TSt', xy=(tst_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = psw_i, xmax=psw_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.annotate('PSw', xy=(psw_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = isw_i, xmax=isw_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.annotate('ISw', xy=(isw_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = msw_i, xmax=msw_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.annotate('MSw', xy=(msw_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = tsw_i, xmax=tsw_f, ymin =0, ymax=1, alpha = 0.6, color='y')
+    plt.annotate('TSw', xy=(tsw_i + 5, av_img.max() * 0.90))  
+ 
+
+    import cStringIO
+    format = "png"
+    sio = cStringIO.StringIO()
+    plt.savefig(sio, format=format)
+
+    html_str = """<html><body>
+    <img src="data:image/png;base64,%s"/>
+    </body></html>""" % sio.getvalue().encode("base64").strip()
+
+    plt.close()
     return html_str, 200
 
 @main_blueprint.route('/gait_sample/<id_positionals_data>/<angle_index>/angles/', methods=['GET'])
@@ -241,12 +321,61 @@ def plot_angles(id_positionals_data, angle_index):
     component_a = t[int(angle['component_a'])][0:3][:]
     component_b = t[int(angle['component_b'])][0:3][:]
     a = cinematic.get_angles(np.array(origin).T, np.array(component_a).T, np.array(component_b).T)  
-    import matplotlib.pyplot as plt, mpld3
-    fig = plt.figure()
-    curve_x, = plt.plot(a, 'r')
-    plt.legend([curve_x], ['Angles'])
-    html_str = mpld3.fig_to_html(fig)
+
+    a_img = a 
+    a_dom = 100 * np.arange(0, len(a_img))/np.float(len(a_img))
+    lr_i = 0
+    lr_f = a_dom.max() * 0.12 
+    mst_i = lr_f
+    mst_f = a_dom.max() * 0.31
+    tst_i = mst_f
+    tst_f = a_dom.max() * 0.50
+    psw_i = tst_f
+    psw_f = a_dom.max() * 0.62
+    isw_i = psw_f
+    isw_f = a_dom.max() * 0.75
+    msw_i = isw_f
+    msw_f = a_dom.max() * 0.87
+    tsw_i = msw_f
+    tsw_f = a_dom.max() * 1
+
+    import matplotlib.pyplot as plt
+    fig = plt.figure(1)
+
+    plt.subplot(1,1,1)
+    plt.title("Angles for %s" % angle['description'])
+    plt.ylabel ("Rads")
+    plt.xlabel ("Percentual Gait Cycle")
+    plt.axis([0, a_dom.max(), a_img.min(), a_img.max()])
+    curve_a, = plt.plot(a_dom, a_img, 'r')
+    plt.axvspan(xmin = lr_i, xmax=lr_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.annotate('LR', xy=(lr_i + 5, a_img.max() * 0.90))  
+    plt.axvspan(xmin = mst_i, xmax=mst_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.annotate('MSt', xy=(mst_i + 5, a_img.max() * 0.90))  
+    plt.axvspan(xmin = tst_i, xmax=tst_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.annotate('TSt', xy=(tst_i + 5, a_img.max() * 0.90))  
+    plt.axvspan(xmin = psw_i, xmax=psw_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.annotate('PSw', xy=(psw_i + 5, a_img.max() * 0.90))  
+    plt.axvspan(xmin = isw_i, xmax=isw_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.annotate('ISw', xy=(isw_i + 5, a_img.max() * 0.90))  
+    plt.axvspan(xmin = msw_i, xmax=msw_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.annotate('MSw', xy=(msw_i + 5, a_img.max() * 0.90))  
+    plt.axvspan(xmin = tsw_i, xmax=tsw_f, ymin =0, ymax=1, alpha = 0.6, color='y')
+    plt.annotate('TSw', xy=(tsw_i + 5, a_img.max() * 0.90))  
+ 
+
+    import cStringIO
+    format = "png"
+    sio = cStringIO.StringIO()
+    plt.savefig(sio, format=format)
+
+    html_str = """<html><body>
+    <img src="data:image/png;base64,%s"/>
+    </body></html>""" % sio.getvalue().encode("base64").strip()
+
+    plt.close()
     return html_str, 200
+
 
 @main_blueprint.route('/simulation/cmac/training/', methods=['POST'])
 def run_cmac_training():
