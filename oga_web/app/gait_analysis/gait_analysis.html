@@ -1,4 +1,9 @@
-<md-toolbar layout="row">
+<div id="webgl_parent" width="100%" height="100%"  ng-show="isPlaySample" flex >
+	<div flex id='webgl_output' width="100%" height="100%" >
+	</div>
+</div>
+
+<md-toolbar layout="row" ng-hide="isPlaySample">
 	<md-button aria-label='Menu' ng-click="goBack()">
 		<md-tooltip>Back</md-tooltip>
 		<ng-md-icon icon="arrow_back" size="48"></ng-md-icon>
@@ -6,7 +11,7 @@
 	<h1>{{apptitle}}</h1>
 	<span flex></span>
 </md-toolbar>
-<section layout='row' style="height:100%;" flex>
+<section layout='row' style="height:100%;" flex ng-hide="isPlaySample">
 	<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" flex>
 		<h2>Gait Analysis</h2>
 		<md-button ng-click="close()" class="md-primary" hide-gt-md>
@@ -57,10 +62,6 @@
 			</div>
 		</form>
 		<div flex ng-include src="'gait_analysis/new_angle.html'" ng-show="isAddingNewAngle"></div>
-		<div width="100%" height="100%"  ng-show="isPlaySample" flex >
-			<div flex id='webgl_output' width="100%" height="100%" >
-			</div>
-		</div>
 		<div flex ng-show='isShowPlot' ng-include src="'gait_analysis/plot.html'">
 		</div>
 	</md-content>

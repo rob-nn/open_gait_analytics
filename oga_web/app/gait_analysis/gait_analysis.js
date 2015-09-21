@@ -14,6 +14,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	});
 }])
 .controller('gaitAnalysisCtrl', function (
+	$route,
 	$rootScope, 
 	$scope, 
 	$location, 
@@ -59,6 +60,8 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.showMarkers = showMarkers;
 	$scope.showAngles = showAngles;
 	$scope.goBack = goBack;
+
+	dat.GUI.toggleHide();
 
 	$scope.$on('cancelAddNewAngle', function(event) {
 		$scope.isAddingNewAngle = false;
@@ -154,6 +157,9 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	}
 
 	function playGaitSample() {
+		var content = document.getElementById("webgl_parent");
+		var canvas = document.getElementById("webgl_output");
+
 		positionalsDataFacade.getTrajectories($scope.positionalsData._id.$oid).success(function(data, status, headers, config) {
 			$scope.isPlaySample = true;
 			init(data, $scope.positionalsData.frames, $scope.positionalsData.frame_rate);
@@ -162,92 +168,180 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		});
 
 		function init(data, frames, frameRate) {
-
-			var padding = 0;
-			var content = document.getElementById("md-content-gait-sample-detail");
-			var canvas = document.getElementById("webgl_output");
 			var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera(45, (content.clientWidth - padding) / (content.clientHeight - padding), 0.1, 10000); 
+			var camera = new THREE.PerspectiveCamera(45, (window.innerWidth) / (window.innerHeight), 0.1, 10000); 
 			var renderer = new THREE. WebGLRenderer();
-			var sphereGeometry = new THREE.SphereGeometry(20, 20, 20);
-			var sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
-			var trackballControls = new THREE.TrackballControls(camera, content);
-			var clock = new THREE.Clock();
-			var animationId = null;
+			renderer.setClearColor(0xEEEEEE, 1.0);
+			renderer.setSize(window.innerWidth,window.innerHeight);
+
+
+			var projector = new THREE.Projector();	
+			window.addEventListener('resize', onResize, false);
+			renderer.domElement.addEventListener('mousedown', onDocumentMouseDown, false);
+			//window.addEventListener('mousemove', onDocumentMouseMove, false);
+
 			var spheres = [];
-			var frame = 0;
-			var axes = new THREE.AxisHelper(5000);
-			scene.add(axes);
-
-			camera.position.x = 4000;
-			camera.position.y = 4000;
-			camera.position.z = 4000;
-			camera.lookAt(scene.position);
-
-			renderer.setClearColor(0x000000);
-			renderer.setSize(content.clientWidth, content.clientHeight);
-
+			var markerTexts = []
 			for (var i =0; i < data.length; i++) {
+				var sphereGeometry = new THREE.SphereGeometry(40, 20, 20);
+				var sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
 				var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 				spheres.push(sphere);
 				scene.add(sphere);
+				var options = { 
+					size: 90, 
+					height: 90, 
+					weight: 'normal', 
+					font: 'helvetiker', 
+					style: 'normal', 
+					bevelThickness: 2, 
+					bevelSize: 4, 
+					bevelSegments: 3, 
+					bevelEnabled: false, 
+					curveSegments: 12, 
+					steps: 1 };
+				var markerText = createMesh(new THREE.TextGeometry( formatMarkerName(i), options));
+				markerText.position.z = 0;
+				markerText.position.y = 0;
+				markerText.position.x = 0;
+				markerTexts.push(markerText);
+
 			}
 
-			trackballControls.rotateSpeed = 0.5;
-			trackballControls.zoomSpeed = 0.5;
-			trackballControls.panSpeed = 0.5;
+			var axes = new THREE.AxisHelper(10000);
+			scene.add(axes);
 
+			camera.position.x = 5000;
+			camera.position.y = 5000;
+			camera.position.z = 5000;
+			camera.lookAt(scene.position);
+
+			// add subtle ambient lighting
+			var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+			scene.add(ambientLight);
+
+			// add spotlight for the shadows
+			var spotLight = new THREE.SpotLight(0xffffff);
+			spotLight.position.set(-40, 60, -10);
+			scene.add(spotLight);
+							
 			canvas.appendChild(renderer.domElement);
 
-			window.removeEventListener('resize', onResize);
-			window.addEventListener('resize', onResize, false);
-			window.addEventListener('mousedown', onMouseMove,false );
-			var raycaster = new THREE.Raycaster();
-			var mouse = new THREE.Vector2();
-			function onMouseMove(event) {
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;	
-				// update the picking ray with the camera and mouse position	
-				raycaster.setFromCamera( mouse, camera );	
+			var clock = new THREE.Clock();
+			var animationId = null;
+			var frame = 0;
 
-				// calculate objects intersecting the picking ray
-				var intersects = raycaster.intersectObjects(spheres);
-
-				for ( var i = 0; i < intersects.length; i++ ) {
-
-					intersects[ i ].object.material.color.set( 0x0000ff );
-	
-				}
-
-				renderer.render( scene, camera );	
-
-			}
-
-			var pause = false;
+			var tube;
 			var controls = new function() {
 				this.frameSpeed = 1;
 				this.play =  function () {pause = false; };
 				this.pause=  function () {pause = true; };
 				this.frames = 0;
+				this.showRay = false;
+				this.close = function (){
+					$scope.isPlaySample = false;
+					$route.reload();
+				};
 			}
 			var gui = new dat.GUI();
 			gui.add(controls, 'frameSpeed', 0, 3);
 			gui.add(controls, 'pause');
 			gui.add(controls, 'play');
 			gui.add(controls, 'frames', 0, $scope.positionalsData.frames).listen();
+			gui.add(controls, 'showRay').onChange(function (e) {
+			    if (tube) scene.remove(tube)
+			});
+			gui.add(controls, 'close');
+			
+
+			var trackballControls = new THREE.TrackballControls(camera);
+			trackballControls.rotateSpeed = 0.5;
+			trackballControls.zoomSpeed = 0.5;
+			trackballControls.panSpeed = 0.5;
+
+			render();
+
+
+			function createMesh(geom) {
+
+				// assign two materials
+				//            var meshMaterial = new THREE.MeshLambertMaterial({color: 0xff5555});
+				//            var meshMaterial = new THREE.MeshNormalMaterial();
+				var meshMaterial = new THREE.MeshPhongMaterial({
+				specular: 0xffffff,
+				color: 0xeeffff,
+				shininess: 100,
+				metal: true
+				});
+				//            meshMaterial.side=THREE.DoubleSide;
+				// create a multimaterial
+				var plane = THREE.SceneUtils.createMultiMaterialObject(geom, [meshMaterial]);
+
+				return plane;
+			}
+			var pause = false;
 			var last_frame = 0
 			function update_frames() {
 				requestAnimationFrame(update_frames);
 				if (controls)
 					controls.frames = last_frame;
 			}
+			
+			var markText="";	
+			function onDocumentMouseDown(event) {
 
-			render();
+			    var vector = new THREE.Vector3(( event.clientX / window.innerWidth ) * 2 - 1, -( event.clientY / window.innerHeight ) * 2 + 1, 0.5);
+			    vector = vector.unproject(camera);
+
+			    var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+
+			    var intersects = raycaster.intersectObjects(spheres);
+
+			    if (intersects.length > 0) {
+				if (intersects[0].object.material.color.getHex() == 0x0000ff ){
+					intersects[0].object.material.color.setHex(0xff0000);
+					intersects[0].object.remove(markerTexts[spheres.indexOf(intersects[0].object)]);
+				}
+				else {
+					intersects[0].object.material.color.setHex(0x0000ff);
+					intersects[0].object.add(markerTexts[spheres.indexOf(intersects[0].object)]);
+				}
+			    }
+			}
+
+			function onDocumentMouseMove(event) {
+			    if (controls.showRay) {
+				var vector = new THREE.Vector3(( event.clientX / window.innerWidth ) * 2 - 1, -( event.clientY / window.innerHeight ) * 2 + 1, 0.5);
+				vector = vector.unproject(camera);
+
+				var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+				var intersects = raycaster.intersectObjects(spheres);
+
+				if (intersects.length > 0) {
+
+				    var points = [];
+				    points.push(new THREE.Vector3(-30, 39.8, 30));
+				    points.push(intersects[0].point);
+
+				    var mat = new THREE.MeshBasicMaterial({color: 0xff0000, transparent: true, opacity: 0.6});
+				    var tubeGeometry = new THREE.TubeGeometry(new THREE.SplineCurve3(points), 60, 0.001);
+
+				    //if (tube) scene.remove(tube);
+
+				    if (controls.showRay) {
+					tube = new THREE.Mesh(tubeGeometry, mat);
+					scene.add(tube);
+				    }
+				}
+			    }
+			}
+
+
 
 			function onResize() {
 				if ($scope.isPlaySample) {
-					var width = content.clientWidth - padding;
-					var height = content.clientHeight - padding;
+					var width =window.innerWidth;
+					var height =window.innerHeight;
 					camera.aspect = width / height;
 					camera.updateProjectionMatrix();
 					renderer.setSize(width, height);
@@ -258,7 +352,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			var time = 0;
 			function render() {
 				if ($scope.isPlaySample) {
-					
 
 					var delta = clock.getDelta();
 					trackballControls.update(delta);
@@ -296,8 +389,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 						window.cancelAnimationFrame(animationId);
 					while(canvas.hasChildNodes())
 						canvas.removeChild(canvas.childNodes[0]);
-					padding = null;
-					content = null;
 					canvas = null;
 					scene = null;
 					camera = null;
