@@ -171,6 +171,9 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera(45, (window.innerWidth) / (window.innerHeight), 0.1, 10000); 
 			var renderer = new THREE. WebGLRenderer();
+			var axes = new THREE.AxisHelper(10000);
+			scene.add(axes);
+
 			renderer.setClearColor(0xEEEEEE, 1.0);
 			renderer.setSize(window.innerWidth,window.innerHeight);
 
@@ -187,7 +190,9 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 				var sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
 				var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 				spheres.push(sphere);
-				scene.add(sphere);
+				axes.add(sphere);
+				sphere.rotation.z = Math.PI;
+				sphere.rotation.x = -Math.PI /2;
 				var options = { 
 					size: 90, 
 					height: 90, 
@@ -207,9 +212,6 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 				markerTexts.push(markerText);
 
 			}
-
-			var axes = new THREE.AxisHelper(10000);
-			scene.add(axes);
 
 			camera.position.x = 5000;
 			camera.position.y = 5000;
@@ -243,14 +245,15 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 					$route.reload();
 				};
 			}
-			var gui = new dat.GUI();
-			gui.add(controls, 'frameSpeed', 0, 3);
+			var gui = new dat.GUI( );
+			gui.domElement.id = 'gui';
+			//gui.add(controls, 'frameSpeed', 0, 3);
 			gui.add(controls, 'pause');
 			gui.add(controls, 'play');
 			gui.add(controls, 'frames', 0, $scope.positionalsData.frames).listen();
-			gui.add(controls, 'showRay').onChange(function (e) {
-			    if (tube) scene.remove(tube)
-			});
+			//gui.add(controls, 'showRay').onChange(function (e) {
+			//    if (tube) scene.remove(tube)
+			//});
 			gui.add(controls, 'close');
 			
 
@@ -259,6 +262,8 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			trackballControls.zoomSpeed = 0.5;
 			trackballControls.panSpeed = 0.5;
 
+			axes.rotation.x = -Math.PI / 2;
+			axes.rotation.z = Math.PI;
 			render();
 
 
@@ -364,8 +369,8 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 							spheres[i].visible = false;
 						} else {
 							spheres[i].position.x = x; 
-							spheres[i].position.y = z;
-							spheres[i].position.z = y;
+							spheres[i].position.y = y;
+							spheres[i].position.z = z;
 							spheres[i].visible = true;
 						}
 					}		
