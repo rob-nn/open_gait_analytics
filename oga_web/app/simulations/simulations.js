@@ -113,6 +113,7 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 				component_description: 'x'
 			};
 			outputs.push(output);
+			i++;
 			output = {
 				index: i,
 				type: 0, //0 marker, 1 angle
@@ -122,6 +123,7 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 				component_description: 'y'
 			};
 			outputs.push(output);
+			i++;
 			output = {
 				index: i,
 				type: 0, //0 marker, 1 angle
@@ -145,6 +147,7 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 				component_description: 'angles'
 			};
 			outputs.push(output);
+			i++;
 			output = {
 				index: i,
 				type: 1, //0 marker, 1 angle
