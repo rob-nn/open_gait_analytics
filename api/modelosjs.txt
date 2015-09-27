@@ -1,0 +1,32 @@
+
+(Pdb) .keys()
+[u'idGaitSample', u'idPatient', u'activationsNumber', u'markers', u'angles', u'iterationsNumber', u'output']
+
+
+
+
+cmacConfig['markers']
+[
+{u'index': 1, u'description': u'left tibia'}, 
+{u'index': 2, u'description': u'left first metatarsal head'}, 
+{u'index': 6, u'description': u'left  calcaneus'}, 
+{u'index': 7, u'description': u'left fifth metatarsal head'}, 
+{u'index': 9, u'description': u'right tibia'}, 
+{u'index': 10, u'description': u'left knee'}, 
+{u'index': 13, u'description': u'right lateral malleolus'}, 
+{u'index': 14, u'description': u'left trochanter'}, 
+{u'index': 15, u'description': u'left lateral malleolus'}, 
+{u'index': 16, u'description': u'right head first metatarsal'}, 
+{u'index': 18, u'description': u'right fifth metatarsal head'}, 
+{u'index': 19, u'description': u'right knee'}, 
+{u'index': 20, u'description': u'right calcaneus', u'xCheckedForInput': True, u'zCheckedForInput': True, u'yCheckedForInput': True, u'showQZ': True, u'showQX': True, u'showQY': True}, 
+{u'index': 22, u'description': u'right trochanter', u'xCheckedForInput': True, u'qx': 200, u'showQZ': False, u'showQX': True, u'showQY': False}]
+
+
+angles
+[
+	{u'origin': 10, u'description': u'Left Knee', u'anglesQ': 100, u'showAngVel': True, u'angVelQ': 100, u'angVelCheckedForInput': True, u'component_b': 1, u'component_a': 14, u'showAngles': True, u'anglesCheckedForInput': True}, 
+	{u'origin': 19, u'component_b': 9, u'component_a': 22, u'description': u'Right Knee'}]
+
+output
+{u'index': 45, u'description': u'angle - Right Knee - angular velocities', u'component_description': u'angular velocities', u'component': u'v', u'_id': u'1', u'type': 1}

@@ -241,7 +241,7 @@ class TestRest(unittest.TestCase):
     def test_run_cmac_training(self):
         import oga_api.etl.qtm as qtm
         trajectories = qtm.readQTMFile('oga_api/etl/Walk1.mat')['trajectories']
-	positional_data = {'patient_id': ObjectId(u'000000000000000000000000'), 'gait_sample_index':0, 'initial_frame':300, 'final_frame': 1000, 'frames': 1400, 'trajectories': trajectories.tolist()}
+	positional_data = {'patient_id': ObjectId(u'000000000000000000000000'), 'gait_sample_index':0, 'initial_frame':300, 'final_frame': 1000, 'frames': 1400, 'trajectories': trajectories.tolist(), 'angles': [{u'origin': 10, u'component_b': 1, u'component_a': 14, u'description': u'Left Knee'}, {u'origin': 19, u'component_b': 9, u'component_a': 22, u'description': u'Right Knee'}]}
 	pos_id = self.db.positionals_data.insert_one(positional_data).inserted_id
         markers = [
                 {

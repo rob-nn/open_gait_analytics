@@ -232,6 +232,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			var clock = new THREE.Clock();
 			var animationId = null;
 			var frame = 0;
+			
 
 			var tube;
 			var controls = new function() {
@@ -240,8 +241,9 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 				this.pause=  function () {pause = true; };
 				this.frames = 0;
 				this.showRay = false;
-				this.close = function (){
+				this.close = function () {
 					$scope.isPlaySample = false;
+					$route.reload();
 					$route.reload();
 				};
 			}
@@ -389,6 +391,11 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 					animationId = requestAnimationFrame(render);
 					renderer.render(scene, camera);
 				} else {
+					clear_window();
+				}
+				
+			};
+			function clear_windows() {
 					window.removeEventListener('resize', onResize);
 					if (animationId) 
 						window.cancelAnimationFrame(animationId);
@@ -409,9 +416,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 					dat.GUI.toggleHide();
 					gui = null;
 					controls = null;
-				}
-				
-			};
+			}
 		}
 	}
 

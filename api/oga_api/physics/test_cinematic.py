@@ -78,6 +78,32 @@ class TestCinematic(unittest.TestCase):
         av = c.calc_angular_velocities(o, p1, p2, 1)
         self.assertTrue((np.round(av, 4) == results).all())
 
+    def test_get_vetorial_velocities(self):
+        vec_1 = np.array([0, 1, 2, 3])
+        time = 1
+        vect_v = c.get_vectorial_velocities(vec_1, time)
+        self.assertTrue((vect_v == np.array([1, 1, 1])).all())
+
+    def test_get_vetorial_velocities_half_time(self):
+        vec_1 = np.array([0, 1, 2, 3])
+        time = 0.5 
+        vect_v = c.get_vectorial_velocities(vec_1, time)
+        self.assertTrue((vect_v == np.array([2, 2, 2])).all())
+
+    def test_get_vetorial_velocities_with_acceleration(self):
+        vec_1 = np.array([0, 1, 3, 6.55])
+        time = 0.5 
+        vect_v = c.get_vectorial_velocities(vec_1, time)
+        self.assertTrue((vect_v == np.array([2, 4, 7.1])).all())
+
+    def test_get_3d_velocities(self):
+        vec_x = np.array([1, 2, 3])
+        vec_y = np.array([1, 3, 5])
+        vec_z = np.array([1, 4, 7])
+        v_x, v_y, v_z = c.get_3d_velocities(vec_x, vec_y, vec_z, 1)
+        self.assertTrue((v_x == np.array([1, 1])).all())
+        self.assertTrue((v_y == np.array([2, 2])).all())
+        self.assertTrue((v_z == np.array([3, 3])).all())
 
 if __name__ == '__main__':
     unittest.main()
