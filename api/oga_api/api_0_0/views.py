@@ -270,7 +270,7 @@ def plot_angular_velocity(id_positionals_data, angle_index):
 
     plt.subplot(1,1,1)
     plt.title("Angular Velociteis for %s" % angle['description'])
-    plt.ylabel ("Rads/Seconds")
+    plt.ylabel ("Degrees/Seconds")
     plt.xlabel ("Percentual Gait Cycle")
     plt.axis([0, av_dom.max(), av_img.min(), av_img.max()])
     curve_av, = plt.plot(av_dom, av_img, 'r')
@@ -344,7 +344,7 @@ def plot_angles(id_positionals_data, angle_index):
 
     plt.subplot(1,1,1)
     plt.title("Angles for %s" % angle['description'])
-    plt.ylabel ("Rads")
+    plt.ylabel ("Degrees")
     plt.xlabel ("Percentual Gait Cycle")
     plt.axis([0, a_dom.max(), a_img.min(), a_img.max()])
     curve_a, = plt.plot(a_dom, a_img, 'r')
@@ -426,8 +426,8 @@ def run_cmac_training():
     fig.set_size_inches(20, 6)
 
     plt.subplot(1,2,1)
-    plt.title("Recuperar ttulo ")
-    plt.ylabel ("Recuperar y label")
+    plt.title("Title")
+    plt.ylabel ("y label")
     plt.xlabel ("Percentual Gait Cycle")
     plt.axis([0, av_dom.max(), av_img.min(), av_img.max()])
     plt.axvspan(xmin = lr_i, xmax=lr_f, ymin =0, ymax=1, alpha = 0.2, color='b')
