@@ -7,7 +7,7 @@ class TestCinematic(unittest.TestCase):
         a0 = np.array([0, 0, 0])
         a1 = np.array([1, 0, 0])
         a2 = np.array([0, 1, 0])
-        r = np.array([np.round(np.pi/2, 4)])
+        r = np.array([np.round(90, 4)])
 
         o = a0.reshape(1, 3)
         p1 = a1.reshape(1, 3)
@@ -26,7 +26,7 @@ class TestCinematic(unittest.TestCase):
         o = np.append(o, a0).reshape(len(o) + 1, 3)
         p1 = np.append(p1, a1).reshape(len(p1) + 1, 3)
         p2 = np.append(p2, np.array([-1, 1, 0])).reshape(len(p2) + 1, 3)
-        results = np.append(results, np.array([np.round(np.pi* 3/4, 4)]))
+        results = np.append(results, np.array([np.round(45, 4)]))
         angles = c.get_angles(o, p1, p2)
         self.assertTrue((np.round(angles, 4) ==results).all())
 
@@ -55,6 +55,8 @@ class TestCinematic(unittest.TestCase):
         p1 = a1.reshape(1, 3)
         p2 = a2.reshape(1, 3)
 
+	
+
         o = np.append(o, a0).reshape(len(o) + 1, 3)
         p1 = np.append(p1, a1).reshape(len(p1) + 1, 3)
         p2 = np.append(p2, a2).reshape(len(p2) + 1, 3)
@@ -62,19 +64,20 @@ class TestCinematic(unittest.TestCase):
         av = c.calc_angular_velocities(o, p1, p2, 1)
         self.assertTrue((np.round(av, 4) ==results).all())
 
-        #rotate pi/2
+        #rotate -90 degrees
         o = np.append(o, a0).reshape(len(o) + 1, 3)
         p1 = np.append(p1, a1).reshape(len(p1) + 1, 3)
         p2 = np.append(p2, np.array([-1, 0, 0])).reshape(len(p2) + 1, 3)
-        results = np.append(results, [np.round(np.pi/2, 4)]); 
+        results = np.append(results, [np.round(-90, 4)]); 
         av = c.calc_angular_velocities(o, p1, p2, 1)
+	#import pdb; pdb.set_trace()
         self.assertTrue((np.round(av, 4) == results).all())
 
-        #rotate -pi/2
+        #rotate 90
         o = np.append(o, a0).reshape(len(o) + 1, 3)
         p1 = np.append(p1, a1).reshape(len(p1) + 1, 3)
         p2 = np.append(p2, np.array([0, 1, 0])).reshape(len(p2) + 1, 3)
-        results = np.append(results, [np.round(-1 * np.pi/2, 4)]); 
+        results = np.append(results, [np.round(90, 4)]); 
         av = c.calc_angular_velocities(o, p1, p2, 1)
         self.assertTrue((np.round(av, 4) == results).all())
 

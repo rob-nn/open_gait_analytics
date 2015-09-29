@@ -41,6 +41,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.isPlaySample = false;
 	$scope.loading = true;
 	$scope.positionalsData = null;
+	$scope.controls = null;
 
 	$scope.addNewAngle = addNewAngle;
 	$scope.back = back;
@@ -61,7 +62,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.showAngles = showAngles;
 	$scope.goBack = goBack;
 
-	dat.GUI.toggleHide();
+	//dat.GUI.toggleHide();
 
 	$scope.$on('cancelAddNewAngle', function(event) {
 		$scope.isAddingNewAngle = false;
@@ -237,17 +238,28 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			var tube;
 			var controls = new function() {
 				this.frameSpeed = 1;
-				this.play =  function () {pause = false; };
+				this.minus = function () {
+						this.frameSpeed -= 0.1;	
+						if (this.frameSpeed <0) 
+							this.frameSpeed =0;
+				}
+				this.plus = function () {
+						this.frameSpeed += 0.1;	
+						if (this.frameSpeed > 4)
+							this.frameSpeed = 4;
+				}
+
+				this.play =  function () {pause = false;};
 				this.pause=  function () {pause = true; };
 				this.frames = 0;
 				this.showRay = false;
 				this.close = function () {
 					$scope.isPlaySample = false;
-					$route.reload();
-					$route.reload();
+					window.location.reload();
 				};
 			}
-			var gui = new dat.GUI( );
+			$scope.controls = controls;
+			/**var gui = new dat.GUI( );
 			gui.domElement.id = 'gui';
 			//gui.add(controls, 'frameSpeed', 0, 3);
 			gui.add(controls, 'pause');
@@ -257,7 +269,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			//    if (tube) scene.remove(tube)
 			//});
 			gui.add(controls, 'close');
-			
+			**/
 
 			var trackballControls = new THREE.TrackballControls(camera);
 			trackballControls.rotateSpeed = 0.5;
@@ -391,30 +403,42 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 					animationId = requestAnimationFrame(render);
 					renderer.render(scene, camera);
 				} else {
-					clear_window();
+					clear_windows();
 				}
 				
 			};
 			function clear_windows() {
+					cancelAnimationFrame(animationId);// Stop the animation
+					renderer.domElement.addEventListener('dblclick', null, false); //remove listener to render
+					scene = null;
+					projector = null;
+					camera = null;
+					controls = null;
+					empty(this.modelContainer);
+					renderer.domElement.addEventListener('resize', null, false); //remove listener to render
 					window.removeEventListener('resize', onResize);
 					if (animationId) 
 						window.cancelAnimationFrame(animationId);
 					while(canvas.hasChildNodes())
 						canvas.removeChild(canvas.childNodes[0]);
+					while(document.hasChildNodes())
+						document.removeChild(canvas.childNodes[0]);
+					while(window.hasChildNodes())
+						window.removeChild(canvas.childNodes[0]);
 					canvas = null;
 					scene = null;
 					camera = null;
 					renderer = null;
 					sphereGeometry = null;
 					sphereMaterial = null;
-					spheres = [];
+					spheres = null;
 					trackballControls = null;
 					clock = null;
 					animationId = null;
 					frame = 0;
 					axes = null;
-					dat.GUI.toggleHide();
-					gui = null;
+					//dat.GUI.toggleHide();
+					//gui = null;
 					controls = null;
 			}
 		}

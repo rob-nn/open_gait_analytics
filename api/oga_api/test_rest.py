@@ -258,16 +258,69 @@ class TestRest(unittest.TestCase):
                     u'showQY': True}, 
                 {u'index': 4, u'description': u'Marcador 2'}, 
                 {u'index': 5, u'description': u'Marcador 3'}]
-	output = {u'index': None, u'description': u'angle - teste - angular velocities', u'component_description': u'angular velocities', u'component': u'v', u'_id': u'1', u'type': 1}
         cmac_config= {
 			'idPatient': u'000000000000000000000000', 
 			'idGaitSample': pos_id, 
 			'activationsNumber': 10, 
-			'iterationsNumber': 0, 
-			'output': output, 
+			'iterationsNumber': 2, 
+			'output': {u'index': None, u'description': u'angle - teste - angular velocities', u'component_description': u'angular velocities', u'component': u'v', u'_id': u'1', u'type': 1}, 
 			'markers': markers, 
 			'angles': {}
                         }
         url = url_for('oga_api_0_0.run_cmac_training')
         r = self.client.post(url, headers={'Content-Type': 'application/json'}, data = json_util.dumps(cmac_config))
         self.assertEqual(r.status_code, 200)
+
+        cmac_config= {
+			'idPatient': u'000000000000000000000000', 
+			'idGaitSample': pos_id, 
+			'activationsNumber': 10, 
+			'iterationsNumber': 2, 
+			'output': {u'index': 44, u'description': u'angle - Right Knee - angles', u'component_description': u'Angles', u'component': u'a', u'_id': u'1', u'type': 1}, 
+			'markers': markers, 
+			'angles': {}
+                        }
+        r = self.client.post(url, headers={'Content-Type': 'application/json'}, data = json_util.dumps(cmac_config))
+        self.assertEqual(r.status_code, 200)
+
+        cmac_config= {
+			'idPatient': u'000000000000000000000000', 
+			'idGaitSample': pos_id, 
+			'activationsNumber': 10, 
+			'iterationsNumber': 2, 
+			'output': {u'index': 6, u'description': u'marker - left  calcaneus - x', u'component_description': u'Velocity x', u'component': u'x', u'_id': 6, u'type': 0}, 
+			'markers': markers, 
+			'angles': {}
+                        }
+        r = self.client.post(url, headers={'Content-Type': 'application/json'}, data = json_util.dumps(cmac_config))
+        self.assertEqual(r.status_code, 200)
+
+        cmac_config= {
+			'idPatient': u'000000000000000000000000', 
+			'idGaitSample': pos_id, 
+			'activationsNumber': 10, 
+			'iterationsNumber': 2, 
+			'output': {u'index': 25, u'description': u'marker - left lateral malleolus - y', u'component_description': u'Velocity y', u'component': u'y', u'_id': 15, u'type': 0}, 
+			'markers': markers, 
+			'angles': {}
+                        }
+        r = self.client.post(url, headers={'Content-Type': 'application/json'}, data = json_util.dumps(cmac_config))
+        self.assertEqual(r.status_code, 200)
+
+
+
+	markers = [{u'index': 1, u'description': u'left tibia', u'xCheckedForInput': True, u'qx': 100, u'showQZ': False, u'showQX': True, u'showQY': False}, {u'index': 2, u'description': u'left first metatarsal head', u'qy': 200, u'yCheckedForInput': True, u'showQZ': False, u'showQX': False, u'showQY': True}, {u'index': 6, u'description': u'left  calcaneus', u'zCheckedForInput': True, u'qz': 300, u'showQZ': True, u'showQX': False, u'showQY': False}, {u'index': 7, u'description': u'left fifth metatarsal head'}, {u'index': 9, u'description': u'right tibia'}, {u'index': 10, u'description': u'left knee', u'xCheckedForInput': False, u'qx': 200, u'zCheckedForInput': False, u'qz': 200, u'qy': 200, u'yCheckedForInput': False, u'showQZ': False, u'showQX': False, u'showQY': False}, {u'index': 13, u'description': u'right lateral malleolus'}, {u'index': 14, u'description': u'left trochanter'}, {u'index': 15, u'description': u'left lateral malleolus'}, {u'index': 16, u'description': u'right head first metatarsal'}, {u'index': 18, u'description': u'right fifth metatarsal head'}, {u'index': 19, u'description': u'right knee'}, {u'index': 20, u'description': u'right calcaneus'}, {u'index': 22, u'description': u'right trochanter'}]
+	angles = [{u'origin': 10, u'description': u'Left Knee', u'anglesQ': 400, u'showAngVel': False, u'component_b': 1, u'component_a': 14, u'showAngles': True, u'anglesCheckedForInput': True}, {u'origin': 19, u'description': u'Right Knee', u'showAngVel': True, u'angVelQ': 500, u'angVelCheckedForInput': True, u'component_b': 9, u'component_a': 22, u'showAngles': False}]
+        cmac_config= {
+			'idPatient': u'000000000000000000000000', 
+			'idGaitSample': pos_id, 
+			'activationsNumber': 10, 
+			'iterationsNumber': 2, 
+			'output': {u'index': 25, u'description': u'marker - left lateral malleolus - y', u'component_description': u'Velocity y', u'component': u'y', u'_id': 15, u'type': 0}, 
+			'markers': markers, 
+			'angles': {}
+                        }
+        r = self.client.post(url, headers={'Content-Type': 'application/json'}, data = json_util.dumps(cmac_config))
+        self.assertEqual(r.status_code, 200)
+
+

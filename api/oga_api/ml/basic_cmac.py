@@ -66,10 +66,13 @@ class BasicCMAC(cmac.CMAC):
     def _get_output_data(self, output, trajectories, pos_angles, time_frame):
         if output['type'] == 0: #Marker
             component = 0
-            if output['component'] =='x': component = 0
-            elif output['component'] == 'y': component = 1
-            else: component == 2 # component == z
-            self._out_data = trajectories[output['_id'], component, 0]
+            if output['component'] =='x': 
+                component = 0
+            elif output['component'] == 'y': 
+                component = 1
+            else: 
+                component == 2 # component == z
+            self._out_data = trajectories[output['_id'], component, :]
         else: #1 Angle
             #import pdb; pdb.set_trace()
             angle = pos_angles[int(output['_id'])]
@@ -145,3 +148,12 @@ class BasicCMAC(cmac.CMAC):
         plt.show()
 
 """ 
+class ParameterInvalid(BaseException):
+    def __init__(self, description):
+        self._description = description
+
+    @property
+    def description(self):
+        return self._description
+
+

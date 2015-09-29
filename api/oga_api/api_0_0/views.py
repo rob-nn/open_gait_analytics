@@ -399,9 +399,13 @@ def run_cmac_training():
     #patient = db.patients.find_one({'_id': ObjectId(cmacConfig['idPatient'])})
     pos = db.positionals_data.find_one({'_id': ObjectId(cmacConfig['idGaitSample'])})
     import oga_api.ml.basic_cmac as basic_cmac
-    ##import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     b_cmac = basic_cmac.BasicCMAC(cut_trajectories(pos), pos['angles'], 1.0/float(pos['frames']), cmacConfig['markers'], cmacConfig['angles'], cmacConfig['activationsNumber'], cmacConfig['output'], cmacConfig['iterationsNumber'])
-    b_cmac.train()
+    try:
+	    b_cmac.train()
+    except basic_cmac.ParameterInvalid as invalid:
+        return jsonify({'error': invalid.description}), 500
+
     result = b_cmac.fire_test()
     #basic = bc.BasicCMAC(self._trajectories, self._pos_angles, 1.0/315.0, self._cmacConfig['markers'], self._cmacConfig['angles'], self._cmacConfig['activationsNumber'], self._cmacConfig['output'], self._cmacConfig['iterationsNumber']) 
     av_img = result 
