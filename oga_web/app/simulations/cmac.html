@@ -1,132 +1,137 @@
 <div ng-controller='cmacCtrl' class="md-padding" layout="column" flex>
-	<form name="cmacForm">
-		<h2>Patient</h2>
-		<md-select ng-model="idPatient" placeholder="Choose a patient" ng-change="showSamples()">
-			<md-option ng-repeat="patient in patients" value="{{patient._id.$oid}}">
-				{{patient.name}}
-			</md-option>
-		</md-select>
-		<md-content flex layout="column" ng-show="samples">
-			<h3>Gait Sample</h3>
-			<md-select ng-model="indexSample" placeholder="Choose a gait sample" ng-change="showInputSignals()">
-				<md-option ng-repeat="sample in samples track by $index" value="{{$index}}">
-					{{sample.description}}
+	<div flex ng-show='isShowPlot' ng-include src="'gait_analysis/plot.html'">
+	</div>
+
+	<div class="md-padding" layout="column" flex ng-hide="isShowPlot">
+		<form name="cmacForm">
+			<h2>Patient</h2>
+			<md-select ng-model="idPatient" placeholder="Choose a patient" ng-change="showSamples()">
+				<md-option ng-repeat="patient in patients" value="{{patient._id.$oid}}">
+					{{patient.name}}
 				</md-option>
 			</md-select>
-			<h4 ng-show="markers">Input Signals</h4>
-			<div layout="column" ng-show="markers" >
-				<md-list>
-					<md-subheader>Select marker positions </md-subheader>
-					<md-list-item ng-repeat="marker in markers track by $index">
-						<div layout="row">
-							<p> {{ marker.description  }} &nbsp;</p>
-							<div layout="column">
-								<div layout="row"><p>x</p>
-									<md-checkbox 
-										ng-model="marker.xCheckedForInput"
-										ng-change="showQuantization($index)"></md-checkbox>
-									<md-input-container ng-show="marker.showQX">
-										<label>Quantization</label>
-										<input name="qx" required ng-model="marker.qx" type="number" min="1" max="999"></input>
-										<ng-messages for="cmacForm.qx.$error" multiple>
-											<div ng-messages-include="error_messages.html"></div>
-										</ng-messages>
-									</md-input-container>
-								</div>
-								<div layout="row"><p>y</p><md-checkbox 
-										ng-model="marker.yCheckedForInput"
-										ng-change="showQuantization($index)"></md-checkbox>
-									<md-input-container name="qy" ng-show="marker.showQY">
-										<label>Quantization</label>
-										<input required ng-model="marker.qy" type="number" min="1" max="999"></input>
-										<ng-messages for="cmacForm.qy.$error" multiple>
-											<div ng-messages-include="error_messages.html"></div>
-										</ng-messages>
-									</md-input-container>
-								</div>
-								<div layout="row"><p>z</p><md-checkbox 
-										ng-model="marker.zCheckedForInput"
-										ng-change="showQuantization($index)"></md-checkbox>
-									<md-input-container name="qz" ng-show="marker.showQZ">
-										<label>Quantization</label>
-										<input required ng-model="marker.qz" type="number" min="1" max="999"></input>
-										<ng-messages for="cmacForm.qz.$error" multiple>
-											<div ng-messages-include="error_messages.html"></div>
-										</ng-messages>
-									</md-input-container>
-								</div>
-							</div>
-						</div>
-					</md-list-item>
-				</md-list>
-				<md-list>
-					<md-subheader>Select angles variables </md-subheader>
-					<md-list-item ng-repeat="angle in pos.angles track by $index">
-						<div layout="row">
-							<p> {{angle.description}} &nbsp;</p>
-							<div layout="column">
-								<div layout="row"><p>Angles</p>
-									<md-checkbox ng-model="angle.anglesCheckedForInput" ng-change="showQuantizationAngles($index)"> 
-									</md-checkbox>
-									<md-input-container name="angles" ng-show="angle.showAngles">
-										<label>Quantization</label>
-										<input required ng-model="angle.anglesQ" type="number" min="1" max="999"></input>
-										<ng-messages for="cmacForm.angles.$error" multiple>
-											<div ng-messages-include="error_messages.html"></div>
-										</ng-messages>
-									</md-input-container>
-								</div>
-								<div layout="row"><p>Angular Velocities</p>
-									<md-checkbox ng-model="angle.angVelCheckedForInput" ng-change="showQuantizationAngles($index)"> </md-checkbox>
-									<md-input-container name="angVel" ng-show="angle.showAngVel">
-										<label>Quantization</label>
-										<input required ng-model="angle.angVelQ" type="number" min="1" max="999"></input>
-										<ng-messages for="cmacForm.angVel.$error" multiple>
-											<div ng-messages-include="error_messages.html"></div>
-										</ng-messages>
-									</md-input-container>
+			<md-content flex layout="column" ng-show="samples">
+				<h3>Gait Sample</h3>
+				<md-select ng-model="indexSample" placeholder="Choose a gait sample" ng-change="showInputSignals()">
+					<md-option ng-repeat="sample in samples track by $index" value="{{$index}}">
+						{{sample.description}}
+					</md-option>
+				</md-select>
+				<h4 ng-show="markers">Input Signals</h4>
+				<div layout="column" ng-show="markers" >
+					<md-list>
+						<md-subheader>Select marker velocities </md-subheader>
+						<md-list-item ng-repeat="marker in markers track by $index">
+							<div layout="row">
+								<p> {{ marker.description  }} &nbsp;</p>
+								<div layout="column">
+									<div layout="row"><p>x velocities</p>
+										<md-checkbox 
+											ng-model="marker.xCheckedForInput"
+											ng-change="showQuantization($index)"></md-checkbox>
+										<md-input-container ng-show="marker.showQX">
+											<label>Quantization</label>
+											<input name="qx" required ng-model="marker.qx" type="number" min="1" max="999"></input>
+											<ng-messages for="cmacForm.qx.$error" multiple>
+												<div ng-messages-include="error_messages.html"></div>
+											</ng-messages>
+										</md-input-container>
+									</div>
+									<div layout="row"><p>y velocities</p><md-checkbox 
+											ng-model="marker.yCheckedForInput"
+											ng-change="showQuantization($index)"></md-checkbox>
+										<md-input-container name="qy" ng-show="marker.showQY">
+											<label>Quantization</label>
+											<input required ng-model="marker.qy" type="number" min="1" max="999"></input>
+											<ng-messages for="cmacForm.qy.$error" multiple>
+												<div ng-messages-include="error_messages.html"></div>
+											</ng-messages>
+										</md-input-container>
+									</div>
+									<div layout="row"><p>z velocities</p><md-checkbox 
+											ng-model="marker.zCheckedForInput"
+											ng-change="showQuantization($index)"></md-checkbox>
+										<md-input-container name="qz" ng-show="marker.showQZ">
+											<label>Quantization</label>
+											<input required ng-model="marker.qz" type="number" min="1" max="999"></input>
+											<ng-messages for="cmacForm.qz.$error" multiple>
+												<div ng-messages-include="error_messages.html"></div>
+											</ng-messages>
+										</md-input-container>
+									</div>
 								</div>
 							</div>
-						</div>
-					</md-list-item>
-				</md-list>
-				<h4>CMAC Parameters</h4>
-				<div layout="row">
-					<md-input-container name="activationsNumber">
-						<label>Activations Number</label>
-						<input required ng-model="activationsNumber" type="number" min="1" max="999"></input>
-						<ng-messages for="cmacForm.activationsNumber.$error" multiple>
-						<div ng-messages-include="error_messages.html"></div>
-						</ng-messages>
-					</md-input-container>
-					<md-input-container name="iterationsNumber">
-						<label>Iterations Number</label>
-						<input required ng-model="iterationsNumber" type="number" min="1" max="999"></input>
-						<ng-messages for="cmacForm.iterationsNumber.$error" multiple>
-						<div ng-messages-include="error_messages.html"></div>
-						</ng-messages>
-					</md-input-container>
-					<!--
-						<md-input-container name="trainingPercentual">
-							<label>Training data percentual</label>
-							<input required ng-model="trainingPercentual" type="number" min="1" max="100"></input>
+						</md-list-item>
+					</md-list>
+					<md-list>
+						<md-subheader>Select angles variables </md-subheader>
+						<md-list-item ng-repeat="angle in pos.angles track by $index">
+							<div layout="row">
+								<p> {{angle.description}} &nbsp;</p>
+								<div layout="column">
+									<div layout="row"><p>Angles</p>
+										<md-checkbox ng-model="angle.anglesCheckedForInput" ng-change="showQuantizationAngles($index)"> 
+										</md-checkbox>
+										<md-input-container name="angles" ng-show="angle.showAngles">
+											<label>Quantization</label>
+											<input required ng-model="angle.anglesQ" type="number" min="1" max="999"></input>
+											<ng-messages for="cmacForm.angles.$error" multiple>
+												<div ng-messages-include="error_messages.html"></div>
+											</ng-messages>
+										</md-input-container>
+									</div>
+									<div layout="row"><p>Angular Velocities</p>
+										<md-checkbox ng-model="angle.angVelCheckedForInput" ng-change="showQuantizationAngles($index)"> </md-checkbox>
+										<md-input-container name="angVel" ng-show="angle.showAngVel">
+											<label>Quantization</label>
+											<input required ng-model="angle.angVelQ" type="number" min="1" max="999"></input>
+											<ng-messages for="cmacForm.angVel.$error" multiple>
+												<div ng-messages-include="error_messages.html"></div>
+											</ng-messages>
+										</md-input-container>
+									</div>
+								</div>
+							</div>
+						</md-list-item>
+					</md-list>
+					<h4>CMAC Parameters</h4>
+					<div layout="row">
+						<md-input-container name="activationsNumber">
+							<label>Activations Number</label>
+							<input required ng-model="activationsNumber" type="number" min="1" max="999"></input>
+							<ng-messages for="cmacForm.activationsNumber.$error" multiple>
+							<div ng-messages-include="error_messages.html"></div>
+							</ng-messages>
+						</md-input-container>
+						<md-input-container name="iterationsNumber">
+							<label>Iterations Number</label>
+							<input required ng-model="iterationsNumber" type="number" min="1" max="999"></input>
 							<ng-messages for="cmacForm.iterationsNumber.$error" multiple>
 							<div ng-messages-include="error_messages.html"></div>
 							</ng-messages>
 						</md-input-container>
-					-->
-					<h3>Output Signal</h3>
-					<md-select ng-model="outputIndex" placeholder="Choose a output signal" required>
-						<md-option ng-repeat="out in outputs" value="{{out.index}}">
-							{{out.description}}
-						</md-option>
-					</md-select>
+						<!--
+							<md-input-container name="trainingPercentual">
+								<label>Training data percentual</label>
+								<input required ng-model="trainingPercentual" type="number" min="1" max="100"></input>
+								<ng-messages for="cmacForm.iterationsNumber.$error" multiple>
+								<div ng-messages-include="error_messages.html"></div>
+								</ng-messages>
+							</md-input-container>
+						-->
+						<h3>Output Signal</h3>
+						<md-select ng-model="outputIndex" placeholder="Choose a output signal" required>
+							<md-option ng-repeat="out in outputs" value="{{out.index}}">
+								{{out.description}}
+							</md-option>
+						</md-select>
+					</div>
+					<md-button aria-label='CMAC Training' ng-click='runCmacTraining()'>
+						<md-tooltip>CMAC Training</md-tooltip>
+						<ng-md-icon icon="play_circle_fill" size="72" postion="bl"></ng-md-icon>
+					</md-button>
 				</div>
-				<md-button aria-label='CMAC Training' ng-click='runCmacTraining()'>
-					<md-tooltip>CMAC Training</md-tooltip>
-					<ng-md-icon icon="play_circle_fill" size="72" postion="bl"></ng-md-icon>
-				</md-button>
-			</div>
-		</md-content>
-	</form>
+			</md-content>
+		</form>
+	</div>
 </div>

@@ -15,6 +15,7 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 })
 .controller('cmacCtrl', function($scope, patientsFacade, positionalsDataFacade, simulationFacade, $mdToast) {
 	//functions
+	$scope.back = back;
 	$scope.runCmacTraining = runCmacTraining;
 	$scope.showInputSignals = showInputSignals;
 	$scope.showQuantization = showQuantization;
@@ -31,6 +32,7 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 	$scope.patients = null;
 	$scope.pos = null; //using angles
 	$scope.trainingPercentual = null;
+	$scope.isShowPlot = false;
 
 	patientsFacade.getPatients().success(function(data, status, headers, config){
 		$scope.patients = data;
@@ -110,7 +112,7 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 				description: 'marker - ' + marker.description + ' - x',
 				_id: marker.index,
 				component: 'x', //x, y , z to markers or a, v to angles
-				component_description: 'x'
+				component_description: 'Velocity x'
 			};
 			outputs.push(output);
 			i++;
@@ -120,7 +122,7 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 				description: 'marker - ' + marker.description + ' - y',
 				_id: marker.index,
 				component: 'y', //x, y , z to markers or a, v to angles
-				component_description: 'y'
+				component_description: 'Velocity y'
 			};
 			outputs.push(output);
 			i++;
@@ -130,7 +132,7 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 				description: 'marker - ' + marker.description + ' - z',
 				_id: marker.index,
 				component: 'z', //x, y , z to markers or a, v to angles
-				component_description: 'z'
+				component_description: 'Velocity z'
 			};
 			outputs.push(output);
 			i++;
@@ -144,7 +146,7 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 				description: 'angle - ' + angle.description + ' - angles',
 				_id: index,
 				component: 'a', //x, y , z to markers or a, v to angles
-				component_description: 'angles'
+				component_description: 'Angles'
 			};
 			outputs.push(output);
 			i++;
@@ -154,7 +156,7 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 				description: 'angle - ' + angle.description + ' - angular velocities',
 				_id: index,
 				component: 'v', //x, y , z to markers or a, v to angles
-				component_description: 'angular velocities'
+				component_description: 'Angular Velocities'
 			};
 			outputs.push(output);
 			i++;
@@ -194,11 +196,16 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 		var output = null;
 		for (var index in $scope.outputs) {
 			output = $scope.outputs[index];
-			if (output.index = $scope.outputIndex) break;
+			if (output.index == $scope.outputIndex) break;
 		}
 		simulationFacade.runCmacTraining($scope.idPatient, $scope.pos._id.$oid, $scope.activationsNumber, $scope.iterationsNumber, output, 
 				$scope.markers, $scope.pos.angles).success(function(data, status, headers, config){
-			
+			$scope.isShowPlot = true;
+			var iframe = document.getElementById('plotIframe');
+			var doc = iframe.contentWindow.document;
+			doc.open();
+			doc.write(data);
+			doc.close();
 		}).error(function(data, status, headers, config){
 			var msg = "Error training CMAC.";
 			if (data.error) 
@@ -211,5 +218,10 @@ angular.module('oga_web.simulations', ["ngRoute", "ngMaterial", "ngMdIcons", "og
 			);
 		});
 	}
+
+	function back() {
+		$scope.isShowPlot = false;
+	}
+
 });
 

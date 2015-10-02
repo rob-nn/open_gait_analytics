@@ -270,7 +270,7 @@ def plot_angular_velocity(id_positionals_data, angle_index):
 
     plt.subplot(1,1,1)
     plt.title("Angular Velociteis for %s" % angle['description'])
-    plt.ylabel ("Rads/Seconds")
+    plt.ylabel ("Degrees/Seconds")
     plt.xlabel ("Percentual Gait Cycle")
     plt.axis([0, av_dom.max(), av_img.min(), av_img.max()])
     curve_av, = plt.plot(av_dom, av_img, 'r')
@@ -344,7 +344,7 @@ def plot_angles(id_positionals_data, angle_index):
 
     plt.subplot(1,1,1)
     plt.title("Angles for %s" % angle['description'])
-    plt.ylabel ("Rads")
+    plt.ylabel ("Degrees")
     plt.xlabel ("Percentual Gait Cycle")
     plt.axis([0, a_dom.max(), a_img.min(), a_img.max()])
     curve_a, = plt.plot(a_dom, a_img, 'r')
@@ -379,7 +379,6 @@ def plot_angles(id_positionals_data, angle_index):
 
 @main_blueprint.route('/simulation/cmac/training/', methods=['POST'])
 def run_cmac_training():
-
     cmacConfig = json_util.loads(request.data)
     error = ""
     if not 'idPatient' in cmacConfig:
@@ -400,9 +399,78 @@ def run_cmac_training():
     #patient = db.patients.find_one({'_id': ObjectId(cmacConfig['idPatient'])})
     pos = db.positionals_data.find_one({'_id': ObjectId(cmacConfig['idGaitSample'])})
     import oga_api.ml.basic_cmac as basic_cmac
-    b_cmac = basic_cmac.BasicCMAC(cut_trajectories(pos), cmacConfig['markers'], cmacConfig['activationsNumber'], cmacConfig['output'], cmacConfig['iterationsNumber'])
-    b_cmac.train()
-    return '', 200
+    #import pdb; pdb.set_trace()
+    b_cmac = basic_cmac.BasicCMAC(cut_trajectories(pos), pos['angles'], 1.0/float(pos['frames']), cmacConfig['markers'], cmacConfig['angles'], cmacConfig['activationsNumber'], cmacConfig['output'], cmacConfig['iterationsNumber'])
+    try:
+	    b_cmac.train()
+    except basic_cmac.ParameterInvalid as invalid:
+        return jsonify({'error': invalid.description}), 500
+
+    result = b_cmac.fire_test()
+    #basic = bc.BasicCMAC(self._trajectories, self._pos_angles, 1.0/315.0, self._cmacConfig['markers'], self._cmacConfig['angles'], self._cmacConfig['activationsNumber'], self._cmacConfig['output'], self._cmacConfig['iterationsNumber']) 
+    av_img = result 
+    av_dom = 100 * np.arange(0, len(av_img))/np.float(len(av_img))
+    lr_i = 0
+    lr_f = av_dom.max() * 0.12 
+    mst_i = lr_f
+    mst_f = av_dom.max() * 0.31
+    tst_i = mst_f
+    tst_f = av_dom.max() * 0.50
+    psw_i = tst_f
+    psw_f = av_dom.max() * 0.62
+    isw_i = psw_f
+    isw_f = av_dom.max() * 0.75
+    msw_i = isw_f
+    msw_f = av_dom.max() * 0.87
+    tsw_i = msw_f
+    tsw_f = av_dom.max() * 1
+
+    import matplotlib.pyplot as plt
+    fig = plt.figure(1)
+    fig.set_size_inches(20, 6)
+
+    plt.subplot(1,2,1)
+    plt.title("Title")
+    plt.ylabel ("y label")
+    plt.xlabel ("Percentual Gait Cycle")
+    plt.axis([0, av_dom.max(), av_img.min(), av_img.max()])
+    plt.axvspan(xmin = lr_i, xmax=lr_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.annotate('LR', xy=(lr_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = mst_i, xmax=mst_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.annotate('MSt', xy=(mst_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = tst_i, xmax=tst_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.annotate('TSt', xy=(tst_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = psw_i, xmax=psw_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.annotate('PSw', xy=(psw_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = isw_i, xmax=isw_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.annotate('ISw', xy=(isw_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = msw_i, xmax=msw_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.annotate('MSw', xy=(msw_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = tsw_i, xmax=tsw_f, ymin =0, ymax=1, alpha = 0.6, color='y')
+    plt.annotate('TSw', xy=(tsw_i + 5, av_img.max() * 0.90))  
+    curve_aproximation, = plt.plot(av_dom, av_img, 'r')
+    curve_real, = plt.plot(av_dom, b_cmac.data_out_test, 'b')
+    plt.legend([curve_aproximation, curve_real], ['Aproximation', 'Real' ], loc='best')
+
+    plt.subplot(1, 2, 2)
+    plt.xlabel('Iterations', fontsize=15)
+    plt.ylabel('Mean Squared Error', fontsize=15)
+    plt.plot(b_cmac.t.E)
+
+
+    import cStringIO
+    format = "png"
+    sio = cStringIO.StringIO()
+    plt.savefig(sio, format=format)
+
+    html_str = """<html><body>
+    <img src="data:image/png;base64,%s"/>
+    </body></html>""" % sio.getvalue().encode("base64").strip()
+
+    plt.close()
+    return html_str, 200
+
+
 
 def cut_trajectories(pos):
     trajectories = np.array(pos['trajectories'])

@@ -12,6 +12,7 @@ class CMAC(object):
         for signal_configuration in self._signal_configurations:
             signal_configuration.cmac = self
         self._num_dig = [0]
+ 
         for conf in self.signal_configuration[0:-1]:
             self._num_dig.append(self._num_dig[-1]+ int(np.floor(np.log10(conf.max_value)+1)))
         self._num_dig = 10 ** np.array(self._num_dig)
