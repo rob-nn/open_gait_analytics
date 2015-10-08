@@ -430,8 +430,8 @@ def run_cmac_training():
     fig.set_size_inches(20, 6)
 
     plt.subplot(1,2,1)
-    plt.title("Title")
-    plt.ylabel ("y label")
+    plt.title("Right Knee Angular Velocities")
+    plt.ylabel ("Degrees / Seconds")
     plt.xlabel ("Percentual Gait Cycle")
     plt.axis([0, av_dom.max(), av_img.min(), av_img.max()])
     plt.axvspan(xmin = lr_i, xmax=lr_f, ymin =0, ymax=1, alpha = 0.2, color='b')
