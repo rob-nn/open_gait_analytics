@@ -80,6 +80,13 @@ class TestCinematic(unittest.TestCase):
         results = np.append(results, [np.round(90, 4)]); 
         av = c.calc_angular_velocities(o, p1, p2, 1)
         self.assertTrue((np.round(av, 4) == results).all())
+	
+    def test_calc_angular_accelerations(self):
+	v = np.array([0, 1, 3])
+	aa = c.calc_angular_accelerations(v, 1)
+	self.assertEqual(aa[0], 1)
+	self.assertEqual(aa[1], 2)
+
 
     def test_get_vetorial_velocities(self):
         vec_1 = np.array([0, 1, 2, 3])

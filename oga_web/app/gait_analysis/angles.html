@@ -29,6 +29,7 @@
 	    <th></th>
 	    <th></th>
 	    <th></th>
+	    <th></th>
 	  </tr>
 	  <tr ng-repeat='ang in positionalsData.angles track by $index'>
 		  <td>{{ang.description}}</td>
@@ -53,6 +54,13 @@
 				<ng-md-icon icon="image" size="24" postion="bl"></ng-md-icon>
 			</md-button>
 		  </td>
+		  <td>
+			<md-button aria-label='Plot angluar accelerations' ng-click='plotAngularAccelerations($event, $index)'>
+				<md-tooltip>Plot angluar accelerations</md-tooltip>
+				<ng-md-icon icon="image" size="24" postion="bl"></ng-md-icon>
+			</md-button>
+		  </td>
+
 	  </tr>
 	</table>
 </div>

@@ -482,3 +482,85 @@ def cut_trajectories(pos):
             trajectories = trajectories[:,:, initial:final]
     return trajectories
 
+
+
+
+@main_blueprint.route('/gait_sample/<id_positionals_data>/<angle_index>/angular_accelerations/', methods=['GET'])
+def plot_angular_acceleration(id_positionals_data, angle_index):
+    id_positionals_data = id_positionals_data
+    angle_index = int(angle_index)
+    db = get_db()
+    pos = db.positionals_data.find_one({'_id': ObjectId(id_positionals_data)})
+    if not pos:
+        return jsonify({'error': 'Positionals data not found. Oid:' + id_positionals_data}), 404 
+    if not 'angles' in pos:
+        return jsonify({'error' : 'Positionals data doesn\'t contains angles.'}), 404
+
+    angles = pos['angles']
+    if angle_index < 0 or angle_index >= len(angles):
+        return jsonify({'error' : 'Marker index invalid'}), 404 
+    angle = angles[angle_index]
+    
+    t = cut_trajectories(pos).tolist()
+
+    origin = t[int(angle['origin'])][0:3][:]
+    component_a = t[int(angle['component_a'])][0:3][:]
+    component_b = t[int(angle['component_b'])][0:3][:]
+    av = cinematic.calc_angular_velocities(np.array(origin).T, np.array(component_a).T, np.array(component_b).T, 1/float(pos['frame_rate']))  
+    aa = cinematic.calc_angular_accelerations(av, 1/float(pos['frame_rate']))
+
+    av_img = aa 
+    av_dom = 100 * np.arange(0, len(av_img))/np.float(len(av_img))
+    lr_i = 0
+    lr_f = av_dom.max() * 0.12 
+    mst_i = lr_f
+    mst_f = av_dom.max() * 0.31
+    tst_i = mst_f
+    tst_f = av_dom.max() * 0.50
+    psw_i = tst_f
+    psw_f = av_dom.max() * 0.62
+    isw_i = psw_f
+    isw_f = av_dom.max() * 0.75
+    msw_i = isw_f
+    msw_f = av_dom.max() * 0.87
+    tsw_i = msw_f
+    tsw_f = av_dom.max() * 1
+
+    import matplotlib.pyplot as plt
+    fig = plt.figure(1)
+
+    plt.subplot(1,1,1)
+    plt.title("Angular Accelerations for %s" % angle['description'])
+    plt.ylabel ("Degrees/Seconds^2")
+    plt.xlabel ("Percentual Gait Cycle")
+    plt.axis([0, av_dom.max(), av_img.min(), av_img.max()])
+    curve_av, = plt.plot(av_dom, av_img, 'r')
+    plt.axvspan(xmin = lr_i, xmax=lr_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.annotate('LR', xy=(lr_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = mst_i, xmax=mst_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.annotate('MSt', xy=(mst_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = tst_i, xmax=tst_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.annotate('TSt', xy=(tst_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = psw_i, xmax=psw_f, ymin =0, ymax=1, alpha = 0.2, color='b')
+    plt.annotate('PSw', xy=(psw_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = isw_i, xmax=isw_f, ymin =0, ymax=1, alpha = 0.2, color='y')
+    plt.annotate('ISw', xy=(isw_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = msw_i, xmax=msw_f, ymin =0, ymax=1, alpha = 0.4, color='y')
+    plt.annotate('MSw', xy=(msw_i + 5, av_img.max() * 0.90))  
+    plt.axvspan(xmin = tsw_i, xmax=tsw_f, ymin =0, ymax=1, alpha = 0.6, color='y')
+    plt.annotate('TSw', xy=(tsw_i + 5, av_img.max() * 0.90))  
+ 
+
+    import cStringIO
+    format = "png"
+    sio = cStringIO.StringIO()
+    plt.savefig(sio, format=format)
+
+    html_str = """<html><body>
+    <img src="data:image/png;base64,%s"/>
+    </body></html>""" % sio.getvalue().encode("base64").strip()
+
+    plt.close()
+    return html_str, 200
+
+

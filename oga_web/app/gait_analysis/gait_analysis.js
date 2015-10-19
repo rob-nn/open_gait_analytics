@@ -49,6 +49,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.formatMarkerName =   formatMarkerName ;
 	$scope.plotAngle = plotAngle;
 	$scope.plotAngularVelocities = plotAngularVelocities;
+	$scope.plotAngularAccelerations = plotAngularAccelerations;
 	$scope.showGraphic = showGraphic;
 	$scope.showGaitSample = showGaitSample;
 	$scope.upload = upload; 
@@ -469,7 +470,19 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		});
 	};
 
-
+	function plotAngularAccelerations(ev, angle_index) {
+		positionalsDataFacade.plotAngularAccelerations($scope.positionalsData._id.$oid, angle_index).success(function (data, status, headers, config) {
+			$scope.isShowPlot = true;
+			var iframe = document.getElementById('plotIframe');
+			var doc = iframe.contentWindow.document;
+			doc.open();
+			doc.write(data);
+			doc.close();
+		}).error(function(data, status, headers, config){
+				console.log('Error: ' + status);
+		});
+	};
+ 
 	function showGraphic (selected_marker) {
 		positionalsDataFacade.plotMarker($scope.positionalsData._id.$oid, selected_marker).success(function (data, status, headers, config) {
 			$scope.isShowPlot = true;

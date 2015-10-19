@@ -48,6 +48,11 @@ angular.module('oga_web.oga_facade', [])
 		return $http.get(urlApi.urlString() + 'gait_sample/' + idPositionalsData + '/' + angleIndex + '/angular_velocity/');
 	}
 
+	var _plotAngularAccelerations = function (idPositionalsData, angleIndex) {
+		return $http.get(urlApi.urlString() + 'gait_sample/' + idPositionalsData + '/' + angleIndex + '/angular_accelerations/');
+	}
+
+
 	var _plotMarker = function (idPositionalsMarkers,  marker) {
 		return $http.get(urlApi.urlString() + 'gait_sample/' + idPositionalsMarkers + '/' + marker + '/');
 	};
@@ -65,6 +70,7 @@ angular.module('oga_web.oga_facade', [])
 		updatePositionalsData : _updatePositionalsData, 
 		plotAngles : _plotAngles,
 		plotAngularVelocities : _plotAngularVelocities, 
+		plotAngularAccelerations: _plotAngularAccelerations,
 		plotMarker : _plotMarker,
 		deletePositionalsData : _deletePositionalsData
 	};

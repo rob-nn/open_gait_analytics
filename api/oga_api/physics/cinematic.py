@@ -6,6 +6,12 @@ def calc_angular_velocities(origins, components_a, components_b, time):
     initial = angles[0: len(angles) -1]
     return (final - initial) / time
 
+def calc_angular_accelerations(angular_veolcities, time):
+    final = angular_veolcities[1: len(angular_veolcities)]
+    initial = angular_veolcities[0: len(angular_veolcities) -1]
+    return (final - initial) / time
+
+
 def get_angles(origins, components_a, components_b):
     trans_a = components_a - origins
     trans_b = components_b - origins
