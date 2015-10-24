@@ -18,10 +18,6 @@
 		</md-input-container>
 	</md-content>
 	<div ng-hide='isAdding'>
-		<h3>QTM Data File (MATLAB Format)</h3>
-		<md-input-container ng-hide='positionalsData'>
-			<input ng-required='false' type='file' ngf-select='' ngf-change="upload($files)"></input>
-		</md-input-container>
 		<md-content layout='row' ng-show='positionalsData'>
 			<md-input-container>
 				<label>Initial Contact</label>
@@ -39,6 +35,11 @@
 				</ng-messages>
 			</md-input-container>
 		</md-content>
+
+		<h3>QTM Data File (MATLAB Format)</h3>
+		<md-input-container ng-hide='positionalsData'>
+			<input ng-required='false' type='file' ngf-select='' ngf-change="upload($files)"></input>
+		</md-input-container>
 		<md-content flex layout="row" ng-show='positionalsData'>
 			<md-input-container>
 				<label>Filename</label>

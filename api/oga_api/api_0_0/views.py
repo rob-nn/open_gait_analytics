@@ -165,7 +165,7 @@ def plot_marker(id_positionals_data, marker_index):
 
     plt.subplot(3,1,1)
     plt.title(title)
-    plt.ylabel ("Spacial Data")
+    plt.ylabel ("Spatial Prog.")
     plt.xlabel ("Percentual Gait Cycle")
     plt.axis([0, x_dom.max(), x_img.min(), x_img.max()])
     curve_x, = plt.plot(x_dom, x_img, 'r')
@@ -186,7 +186,7 @@ def plot_marker(id_positionals_data, marker_index):
     plt.annotate('TSw', xy=(tsw_i + 5, x_img.max() * 0.95))  
 
     plt.subplot(3,1,2)
-    plt.ylabel ("Spacial Data")
+    plt.ylabel ("Spatial Prog.")
     plt.xlabel ("Percentual Gait Cycle")
     plt.axis([0, y_dom.max(), y_img.min(), y_img.max()])
     curve_y, = plt.plot(y_dom, y_img, 'b')
@@ -200,7 +200,7 @@ def plot_marker(id_positionals_data, marker_index):
     plt.axvspan(xmin = tsw_i, xmax=tsw_f, ymin =0, ymax=1, alpha = 0.6, color='y')
  
     plt.subplot(3,1,3)
-    plt.ylabel ("Spacial Data")
+    plt.ylabel ("Spatial Prog.")
     plt.xlabel ("Percentual Gait Cycle")
     plt.axis([0, z_dom.max(), z_img.min(), z_img.max()])
     curve_z, = plt.plot(z_dom, z_img, 'g')
