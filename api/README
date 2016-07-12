@@ -1,0 +1,16 @@
+To run the development server apis, first installl Anaconda from:
+https://www.continuum.io/downloads
+
+To create a separeted environment run the command:
+conda env create -f environment.yml
+
+To activate the new environment run
+source activate oga
+
+More information on using conda see: http://conda.pydata.org/docs/using/envs.html
+
+To run the apis run:
+python manage.py runserver
+
+to run tests run:
+python manage.py tests
