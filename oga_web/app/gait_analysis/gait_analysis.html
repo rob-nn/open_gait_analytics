@@ -55,6 +55,7 @@
 		<md-content layout-padding flex>
 			<h3>{{patient.name}}</h3>
 			<p>Birth Date: {{patient.birth|date:'dd/MMM/yyyy'}}</p>
+			<md-button class="md-raised md-primary" ng-click='openPersonalData()'>Personal Data</md-button>
 			<md-subheader>Gait samples.</md-subheader>
 			<md-list flex>
 				<md-list-item ng-repeat='gait_sample in patient.gait_samples' layout='column'>
@@ -75,20 +76,21 @@
 	</md-sidenav>
 	<md-content layout-padding flex width="100%" height="100%" id="md-content-gait-sample-detail">
 		<md-button ng-click="toggleLeft()" class="md-primary" hide-gt-md>
-			Open side	
+			Open side
 		</md-button>
 		<form name='gaitSampleForm'>
 			<div flex ng-hide='isAddingNewAngle || isPlaySample || isShowPlot'>
 				 <div layout="column" flex>
 					<div flex ng-include src="'gait_analysis/gait_sample_detail.html'" ng-show='gaitSampleEnabled || isAdding'></div>
+					<div flex ng-include src="'patient/patient_detail.html'" ng-show="showPersonalData"></div>
 					<div flex ng-include src="'gait_analysis/markers.html'" ng-show="isShowMarkers"></div>
 					<div flex ng-include src="'gait_analysis/angles.html'" ng-show="isShowAngles"></div>
 					<div layout="row" class="oga-float-bottom-right">
-						<md-button aria-label='Delete sample' ng-click='confirmDeletion($event)' ng-show='!isAdding'>
+						<md-button aria-label='Delete sample' ng-click='confirmDeletion($event)' ng-show='!isAdding && !showPersonalData'>
 							<md-tooltip>Delete sample</md-tooltip>
 							<ng-md-icon icon="delete" size="72" postion="bl"></ng-md-icon>
 						</md-button>
-						<md-button aria-label='Save sample' ng-click='saveSample()'>
+						<md-button aria-label='Save sample' ng-click='save()'>
 							<md-tooltip>Save sample</md-tooltip>
 							<ng-md-icon icon="save" size="72" postion="bl"></ng-md-icon>
 						</md-button>
@@ -100,4 +102,4 @@
 		<div flex ng-show='isShowPlot' ng-include src="'gait_analysis/plot.html'">
 		</div>
 	</md-content>
-</section> 
+</section>

@@ -4,7 +4,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$routeProvider
 	.when("/gait_analysis/patient/:id", {
 		templateUrl: "gait_analysis/gait_analysis.html",
-		controller: "gaitAnalysisCtrl", 
+		controller: "gaitAnalysisCtrl",
 		resolve: {
 			patient: function(patientsFacade, $route) {
 				var id = $route.current.params.id;
@@ -15,18 +15,18 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 }])
 .controller('gaitAnalysisCtrl', function (
 	$route,
-	$rootScope, 
-	$scope, 
-	$location, 
+	$rootScope,
+	$scope,
+	$location,
 	$sce,
-	patient, 
+	patient,
 	Upload,
-	$timeout, 
-	$mdSidenav, 
-	$mdUtil, 
+	$timeout,
+	$mdSidenav,
+	$mdUtil,
 	$mdToast,
 	$log,
-        $mdDialog,	
+        $mdDialog,
 	urlApi,
 	patientsFacade,
 	positionalsDataFacade){
@@ -42,6 +42,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.loading = true;
 	$scope.positionalsData = null;
 	$scope.controls = null;
+	$scope.openPersonalData = openPersonalData;
 
 	$scope.addNewAngle = addNewAngle;
 	$scope.back = back;
@@ -52,17 +53,26 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	$scope.plotAngularAccelerations = plotAngularAccelerations;
 	$scope.showGraphic = showGraphic;
 	$scope.showGaitSample = showGaitSample;
-	$scope.upload = upload; 
+	$scope.upload = upload;
 	$scope.addGaitData = addGaitData;
 	$scope.setFile = setFile;
 	$scope.cancel = cancel;
 	$scope.confirmDeletion = confirmDeletion;
 	$scope.playGaitSample = playGaitSample;
-	$scope.saveSample = saveSample;
+	$scope.save = save;
 	$scope.showMarkers = showMarkers;
 	$scope.showAngles = showAngles;
 	$scope.goBack = goBack;
+	$scope.showPersonalData = false;
 
+	if ($scope.gait_sample == null){
+		if ($scope.patient.gait_samples && $scope.patient.gait_samples.length > 0){
+			$scope.showGaitSample($scope.patient.gait_samples[0]);
+		}
+	}
+	else {
+		$scope.showGaitSample($scope.gait_sample);
+	}
 	//dat.GUI.toggleHide();
 
 	$scope.$on('cancelAddNewAngle', function(event) {
@@ -78,7 +88,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		$scope.angle.component_b = parseInt($scope.angle.component_b);
 		$scope.positionalsData.angles.push($scope.angle);
 		$scope.isAddingNewAngle = false;
-		$scope.saveSample();
+		$scope.save();
 	});
 
 	$scope.$watch('isPlaySample', function (newValue, oldValue) {
@@ -88,13 +98,11 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		$scope.loading = false;
 	});
 
-	if ($scope.gait_sample == null){
-		if ($scope.patient.gait_samples && $scope.patient.gait_samples.length > 0){
-			$scope.showGaitSample($scope.patient.gait_samples[0]);
-		}
-	}
-	else {
-		$scope.showGaitSample($scope.gait_sample);
+
+
+	function openPersonalData() {
+		limparTela();
+		$scope.showPersonalData = true;
 	}
 
 	function addNewAngle() {
@@ -105,7 +113,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	function back() {
 		$scope.isShowPlot = false;
 	}
-	
+
 	function confirmDeletion(ev) {
 		// Appending dialog to document.body to cover sidenav in docs app
 		var confirm = $mdDialog.confirm()
@@ -116,7 +124,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		.cancel('Cancel')
 		.targetEvent(ev);
 		$mdDialog.show(confirm).then(function() {
-			positionalsDataFacade.deletePositionalsData($scope.positionalsData._id.$oid).success(function(data, status, headers, config) {	
+			positionalsDataFacade.deletePositionalsData($scope.positionalsData._id.$oid).success(function(data, status, headers, config) {
 				$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid + '/');
 				make_toast('Deleted');
 			})
@@ -139,7 +147,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 		.targetEvent(ev);
 		$mdDialog.show(confirm).then(function() {
 			$scope.positionalsData.angles.splice(angle_index, 1);
-			$scope.saveSample();
+			$scope.save();
 
 		}, function() {
 			make_toast('Canceled');
@@ -171,7 +179,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 
 		function init(data, frames, frameRate) {
 			var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera(45, (window.innerWidth) / (window.innerHeight), 0.1, 10000); 
+			var camera = new THREE.PerspectiveCamera(45, (window.innerWidth) / (window.innerHeight), 0.1, 10000);
 			var renderer = new THREE. WebGLRenderer();
 			var axes = new THREE.AxisHelper(10000);
 			scene.add(axes);
@@ -180,7 +188,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			renderer.setSize(window.innerWidth,window.innerHeight);
 
 
-			var projector = new THREE.Projector();	
+			var projector = new THREE.Projector();
 			window.addEventListener('resize', onResize, false);
 			renderer.domElement.addEventListener('mousedown', onDocumentMouseDown, false);
 			//window.addEventListener('mousemove', onDocumentMouseMove, false);
@@ -195,17 +203,17 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 				axes.add(sphere);
 				sphere.rotation.z = Math.PI;
 				sphere.rotation.x = -Math.PI /2;
-				var options = { 
-					size: 90, 
-					height: 90, 
-					weight: 'normal', 
-					font: 'helvetiker', 
-					style: 'normal', 
-					bevelThickness: 2, 
-					bevelSize: 4, 
-					bevelSegments: 3, 
-					bevelEnabled: false, 
-					curveSegments: 12, 
+				var options = {
+					size: 90,
+					height: 90,
+					weight: 'normal',
+					font: 'helvetiker',
+					style: 'normal',
+					bevelThickness: 2,
+					bevelSize: 4,
+					bevelSegments: 3,
+					bevelEnabled: false,
+					curveSegments: 12,
 					steps: 1 };
 				var markerText = createMesh(new THREE.TextGeometry( formatMarkerName(i), options));
 				markerText.position.z = 0;
@@ -228,24 +236,24 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 			var spotLight = new THREE.SpotLight(0xffffff);
 			spotLight.position.set(-40, 60, -10);
 			scene.add(spotLight);
-							
+
 			canvas.appendChild(renderer.domElement);
 
 			var clock = new THREE.Clock();
 			var animationId = null;
 			var frame = 0;
-			
+
 
 			var tube;
 			var controls = new function() {
 				this.frameSpeed = 1;
 				this.minus = function () {
-						this.frameSpeed -= 0.1;	
-						if (this.frameSpeed <0) 
+						this.frameSpeed -= 0.1;
+						if (this.frameSpeed <0)
 							this.frameSpeed =0;
 				}
 				this.plus = function () {
-						this.frameSpeed += 0.1;	
+						this.frameSpeed += 0.1;
 						if (this.frameSpeed > 4)
 							this.frameSpeed = 4;
 				}
@@ -306,8 +314,8 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 				if (controls)
 					controls.frames = last_frame;
 			}
-			
-			var markText="";	
+
+			var markText="";
 			function onDocumentMouseDown(event) {
 
 			    var vector = new THREE.Vector3(( event.clientX / window.innerWidth ) * 2 - 1, -( event.clientY / window.innerHeight ) * 2 + 1, 0.5);
@@ -365,7 +373,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 					camera.aspect = width / height;
 					camera.updateProjectionMatrix();
 					renderer.setSize(width, height);
-					renderer.render(scene, camera);	
+					renderer.render(scene, camera);
 				}
 			};
 
@@ -383,21 +391,21 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 						if ( x == 0 || y == 0 || z == 0) {
 							spheres[i].visible = false;
 						} else {
-							spheres[i].position.x = x; 
+							spheres[i].position.x = x;
 							spheres[i].position.y = y;
 							spheres[i].position.z = z;
 							spheres[i].visible = true;
 						}
-					}		
+					}
 					if (!pause) {
-						var tprime = (1/frameRate) * (1/controls.frameSpeed);	
-						time = time + delta;			
+						var tprime = (1/frameRate) * (1/controls.frameSpeed);
+						time = time + delta;
 						frame = Math.round(time / tprime);
 
 						if (frame > frames) {
 							frame = 0;
 							time = 0;
-						} 
+						}
 						last_frame = frame;
 						update_frames()
 					}
@@ -406,7 +414,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 				} else {
 					clear_windows();
 				}
-				
+
 			};
 			function clear_windows() {
 					cancelAnimationFrame(animationId);// Stop the animation
@@ -418,7 +426,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 					empty(this.modelContainer);
 					renderer.domElement.addEventListener('resize', null, false); //remove listener to render
 					window.removeEventListener('resize', onResize);
-					if (animationId) 
+					if (animationId)
 						window.cancelAnimationFrame(animationId);
 					while(canvas.hasChildNodes())
 						canvas.removeChild(canvas.childNodes[0]);
@@ -482,7 +490,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 				console.log('Error: ' + status);
 		});
 	};
- 
+
 	function showGraphic (selected_marker) {
 		positionalsDataFacade.plotMarker($scope.positionalsData._id.$oid, selected_marker).success(function (data, status, headers, config) {
 			$scope.isShowPlot = true;
@@ -497,24 +505,31 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	}
 
 	function showGaitSample(gait_sample) {
+		limparTela()
 		if (gait_sample.date) {
 			var date = new Date(gait_sample.date);
 			gait_sample.date = date;
 		}
 		$scope.gait_sample = gait_sample;
 		$scope.gaitSampleEnabled = true;
-		$scope.isAdding = false;
 		var sample_index = $scope.patient.gait_samples.indexOf($scope.gait_sample);
 		positionalsDataFacade.getPositionalsData($scope.patient._id.$oid, sample_index).success(function(data, status, headers, config){
-			$scope.positionalsData = data;			
+			$scope.positionalsData = data;
 		}).error(function(data, status, headers, config){
 			$scope.positionalsData = null;
 		});
+	}
+
+	function limparTela() {
+		$scope.isAdding = false;
 		$scope.isShowMarkers = false;
 		$scope.isShowAngles = false;
 		$scope.isAddingNewAngle = false;
 		$scope.isPlaySample = false;
 		$scope.isShowPlot = false;
+		$scope.showPersonalData = false;
+		$scope.gaitSampleEnabled = false;
+
 	}
 
 	function upload (files){
@@ -556,7 +571,7 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 	function goBack() {
 		$location.path('/patients');
 	}
-	function saveSample(){
+	function save(){
 		if (!$scope.gait_sample.description) {
 			make_toast("Inform description");
 			return;
@@ -571,53 +586,64 @@ angular.module('oga_web.gait_analysis', ["ngFileUpload", "ngRoute", "ngMaterial"
 				$scope.patient.gait_samples = [];
 			$scope.patient.gait_samples.push($scope.gait_sample);
 		}
-		patientsFacade.updatePatient($scope.patient).success(function (data, status, headers, config) {
-			if (!$scope.isAdding) {
-				if (typeof($scope.positionalsData.initial_frame) === 'undefined' || $scope.positionalsData.initial_frame < 0) {
-					make_toast('Initial contact invalid. Must be greater than or equal 0');
-					return;
-				}
-				if (typeof($scope.positionalsData.final_frame) === 'undefined' || $scope.positionalsData.final_frame >= $scope.positionalsData.frames) {
-					make_toast('Terminal swing invalid. Must be less than frames');
-					return;
-				}
-				if ($scope.positionalsData.initial_frame >= $scope.positionalsData.final_frame){
-					make_toast('Initial contantct must be less than final swing');
-					return;
-				}
-				positionalsDataFacade.updatePositionalsData($scope.positionalsData).success(function(data, status, headers, config){
-					var isShowMarkers = $scope.isShowMarkers;
-					var isShowAngles = $scope.isShowAngles;
-					$scope.showGaitSample($scope.gait_sample);
-					$scope.isShowMarkers = isShowMarkers;	
-					$scope.isShowAngles = isShowAngles;	
+		if ($scope.showPersonalData) {
+			patientsFacade.updatePatient($scope.patient).success(function (data, status, headers, config) {
 					make_toast('Saved');
-				})
-				.error(function(data, status, headers, config){
-					make_toast('Failed');
-				});
-			}
-			else {
-				$scope.isAdding = false;
-				$scope.showGaitSample($scope.gait_sample);
-				make_toast('Saved');
-			}
-			//$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid  + '/');
-		})
-		.error(function(data, status, headers, config) {
-			$scope.patient.gait_samples.pop();
-			alert('Error: '+status + ' Data: ' + angular.fromJson(data));
-		});
+			})
+			.error(function(data, status, headers, config) {
+				alert('Error: '+status + ' Data: ' + angular.fromJson(data));
+			});
+
+		}
+		else {
+			patientsFacade.updatePatient($scope.patient).success(function (data, status, headers, config) {
+				if (!$scope.isAdding) {
+					if (typeof($scope.positionalsData.initial_frame) === 'undefined' || $scope.positionalsData.initial_frame < 0) {
+						make_toast('Initial contact invalid. Must be greater than or equal 0');
+						return;
+					}
+					if (typeof($scope.positionalsData.final_frame) === 'undefined' || $scope.positionalsData.final_frame >= $scope.positionalsData.frames) {
+						make_toast('Terminal swing invalid. Must be less than frames');
+						return;
+					}
+					if ($scope.positionalsData.initial_frame >= $scope.positionalsData.final_frame){
+						make_toast('Initial contantct must be less than final swing');
+						return;
+					}
+					positionalsDataFacade.updatePositionalsData($scope.positionalsData).success(function(data, status, headers, config){
+						var isShowMarkers = $scope.isShowMarkers;
+						var isShowAngles = $scope.isShowAngles;
+						$scope.showGaitSample($scope.gait_sample);
+						$scope.isShowMarkers = isShowMarkers;
+						$scope.isShowAngles = isShowAngles;
+						make_toast('Saved');
+					})
+					.error(function(data, status, headers, config){
+						make_toast('Failed');
+					});
+				}
+				else {
+					$scope.isAdding = false;
+					$scope.showGaitSample($scope.gait_sample);
+					make_toast('Saved');
+				}
+				//$location.path('/gait_analysis/patient/' + $scope.patient._id.$oid  + '/');
+			})
+			.error(function(data, status, headers, config) {
+				$scope.patient.gait_samples.pop();
+				alert('Error: '+status + ' Data: ' + angular.fromJson(data));
+			});
+		}
 	};
 	function showMarkers() {
 		$scope.isShowMarkers = !$scope.isShowMarkers;
 		$scope.isShowAngles = false;
-	}	
+	}
 	function showAngles() {
 		$scope.isShowAngles = !$scope.isShowAngles;
 		$scope.isShowMarkers = false;
-	}	
-	
+	}
+
 	$scope.toggleLeft = buildToggler('left');
 
 	/**

@@ -51,8 +51,8 @@
 				</ng-messages>
 			</md-input-container>
 			<md-input-container>
-				<label>Birth</label>
-				<input name='birth' ng-required="false" is-open='opened' type='date' ng-model='patient.birth'/>
+			<label>Birth</label>
+				<md-datepicker name='birth' ng-required="false" is-open='opened' ng-model='patient.birth'></md-datepicker>
 				<ng-messages for="patientForm.birth.$error" multiple>
 					<div ng-messages-include="error_messages.html"></div>
 				</ng-messages>
@@ -95,7 +95,7 @@
 					<div ng-messages-include="error_messages.html"></div>
 				</ng-messages>
 			</md-input-container>
- 
+
 		</md-content>
 		<md-button aria-label='Save Patient' class="oga-float-bottom-right" ng-click='save()' ng-disabled="patientForm.$invalid">
 			<md-tooltip>Save Patient</md-tooltip>
