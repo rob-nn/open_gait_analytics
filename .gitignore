@@ -6,6 +6,7 @@ octave-workspace
 *.swo
 *.pyc
 *.prof*
+*.log
 oga/static/bower_components
 
 

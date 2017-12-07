@@ -7,11 +7,17 @@ from pymongo import MongoClient
 from bson import json_util, ObjectId
 from flask.ext.cors import cross_origin
 import numpy as np
+import pickle
 
 def get_db():
     connection = MongoClient(current_app.config['DB_URI'])
     db = connection[current_app.config['DB_NAME']]
     return db
+
+def get_file_name(positional_data):
+    patient_id = positional_data['patient_id']
+    gait_sample_index = positional_data['gait_sample_index']
+    return str(patient_id) + str(gait_sample_index) + ".oga"
 
 @main_blueprint.route('/patients/<id>/')
 def get_patient(id):
@@ -64,10 +70,13 @@ def gait_sample_upload(patient_id, gait_sample_index):
     for i in range(data['number_markers']):
             markers.append('')
     positional_data['markers'] = markers
-    positional_data['trajectories'] = data['trajectories'].tolist()
+    #positional_data['trajectories'] = data['trajectories'].tolist()
+    with open(get_file_name(positional_data), 'wb') as f:
+        pickle.dump(data['trajectories'].tolist(), f)
+
     db.positionals_data.replace_one({'patient_id': ObjectId(patient_id), 'gait_sample_index': gait_sample_index}, positional_data, True)
     pos = db.positionals_data.find_one({'patient_id': ObjectId(patient_id), 'gait_sample_index': gait_sample_index})
-    del pos['trajectories']
+    #del pos['trajectories']
     return json_util.dumps(pos, allow_nan=False), 200
 
 @main_blueprint.route('/gait_sample/positional_data/<id_patient>/<gait_sample_index>/', methods=["GET"])
@@ -76,19 +85,32 @@ def get_positional_data(id_patient, gait_sample_index):
     db = get_db()
     pos = db.positionals_data.find_one({'patient_id': ObjectId(id_patient), 'gait_sample_index': gait_sample_index})
     if pos:
-        if 'trajectories' in pos.keys():
-            del pos['trajectories']
+        #if 'trajectories' in pos.keys():
+        #    del pos['trajectories']
         return json_util.dumps(pos), 200
     else:
         return jsonify({'error': 'not found'}), 404 
+
+def get_trajectories_from_file(pos):
+    my_list = None
+    with open(get_file_name(pos), 'rb') as f:
+        my_list = pickle.load(f)
+    return my_list
 
 @main_blueprint.route('/gait_sample/positional_data/<id_positionals>/trajectories/', methods=["GET"])
 def get_trajectories(id_positionals):
     db = get_db()
     pos = db.positionals_data.find_one({'_id': ObjectId(id_positionals)})
-    if pos and 'trajectories' in pos.keys():
-        trajectories = [[[trajectorie if not np.isnan(trajectorie) else 0 for trajectorie in column] for column in line] for line in pos['trajectories']]
-        return json_util.dumps(trajectories, allow_nan=False), 200
+    #if pos and 'trajectories' in pos.keys():
+    #    trajectories = [[[trajectorie if not np.isnan(trajectorie) else 0 for trajectorie in column] for column in line] for line in pos['trajectories']]
+    if pos:
+       print ('Getting trajectories...')
+       my_list = get_trajectories_from_file(pos)
+       trajectories = [[[trajectorie if not np.isnan(trajectorie) else 0 for trajectorie in column] for column in line] for line in my_list]
+       print ('Returning trajectories...')
+       my_list = get_trajectories_from_file(pos)
+ 
+       return json_util.dumps(trajectories, allow_nan=False), 200
     else:
         return jsonify({'error': 'not found'}), 404 
 
@@ -99,7 +121,8 @@ def update_positional_data():
     positional = db.positionals_data.find_one({'_id': pos['_id']})
     if not positional:
         return jsonify({'error': 'not found'}), 404
-    pos['trajectories'] = positional['trajectories']
+    #pos['trajectories'] = positional['trajectories']
+    pos['trajectories'] = get_trajectories_from_file(positional)
     db.positionals_data.replace_one({'_id': pos['_id']}, pos)
     return json_util.dumps({"return": "Saved"}), 200
 
@@ -473,7 +496,8 @@ def run_cmac_training():
 
 
 def cut_trajectories(pos):
-    trajectories = np.array(pos['trajectories'])
+    #trajectories = np.array(pos['trajectories'])
+    trajectories = np.array(get_trajectories_from_file(pos))
     if 'initial_frame' in pos and 'final_frame' in pos and 'frames' in pos:
         initial = pos['initial_frame'] 
         final = pos['final_frame']
